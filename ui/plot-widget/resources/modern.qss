@@ -1,0 +1,24 @@
+QWidget#PlotWidget {
+    background-color: #F5F7F9; /* Soft off-white/Blue-gray */
+}
+
+QFrame#frame {
+    border: 1px solid #D1D9E0;
+    border-radius: 8px;
+    background-color: #FFFFFF; /* Pure white plot container */
+}
+
+QwtPlot {
+    background-color: transparent;
+}
+
+QwtPlotCanvas {
+    background-color: #FFFFFF;
+    border: none;
+}
+
+QwtScaleWidget {
+    color: #4A5568; /* Slate gray for readability */
+    font-family: "Inter", "Segoe UI", sans-serif;
+    font-size: 9pt;
+}
