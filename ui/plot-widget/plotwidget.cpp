@@ -18,13 +18,7 @@ Plot::PlotWidget::PlotWidget(QWidget *parent)
     if (ui->frame->layout() == nullptr) {
         QVBoxLayout* layout = new QVBoxLayout(ui->frame);
         layout->setContentsMargins(0, 0, 0, 0);
-        layout->addWidget(m_plot->plot());
-    }
-
-    QFile file(QStringLiteral(":/ui/resources/modern.qss"));
-    if (file.open(QFile::ReadOnly | QFile::Text)) {
-        this->setStyleSheet(QLatin1String(file.readAll()));
-        file.close();
+        // layout->addWidget(m_plot->plot());
     }
 
     m_plot->add_series("Channel 0");
