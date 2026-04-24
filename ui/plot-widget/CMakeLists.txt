@@ -10,6 +10,9 @@ add_library(${NAME}-lib STATIC
     plotwidget.ui
     plothelper.cpp
     plothelper.h
+    scaledialog.cpp
+    scaledialog.h
+    scaledialog.ui
 )
 
 qt_add_resources(${NAME}-lib "styles"
