@@ -5,14 +5,17 @@ set(NAME plot-widget)
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 add_library(${NAME}-lib STATIC
-    plotwidget.cpp
-    plotwidget.h
-    plotwidget.ui
+    multiseriestracker.cpp
+    multiseriestracker.h
     plothelper.cpp
     plothelper.h
     scaledialog.cpp
     scaledialog.h
     scaledialog.ui
+    stylecurvediag.cpp
+    stylecurvediag.h
+    stylecurvediag.ui
+    plotdefs.h
 )
 
 qt_add_resources(${NAME}-lib "styles"

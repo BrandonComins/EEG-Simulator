@@ -1,13 +1,10 @@
 #ifndef PLOTHELPER_H
 #define PLOTHELPER_H
 
-#include "qwt_plot_curve.h"
+#include "multiseriestracker.h"
+#include "plotdefs.h"
 #include <QObject>
 #include <QVector>
-#include <qcolor.h>
-#include <qwt_symbol.h>
-#include <map>
-#include <vector>
 #include <string>
 
 class QFrame;
@@ -17,57 +14,12 @@ class QwtPlotGrid;
 class QwtPlotLegendItem;
 class QwtPlotMagnifier;
 class QwtPlotZoomer;
+class QwtPlotPicker;
 
 namespace Plot {
 
+class StyleCurveDiag;
 class ScaleDialog;
-
-/*!
- * \brief Default color palette for curves when no color is specified.
- */
-const std::vector<QColor> default_palette = {
-    QColor(0x007AFF), // Blue
-    QColor(0xFF3B30), // Red
-    QColor(0x34C759), // Green
-    QColor(0xAF52DE), // Purple
-    QColor(0xFF9500), // Orange
-    QColor(0x5856D6), // Indigo
-    QColor(0xFFCC00), // Yellow
-    QColor(0x5AC8FA)  // Light Blue
-};
-
-/*!
- * \brief Configuration settings for a specific plot curve.
- */
-struct CurveConfig {
-    bool use_antialiasing = true;               //!< Toggle anti-aliased rendering.
-    float line_width = 1.5f;                    //!< Thickness of the curve line.
-    double vertical_offset = 0.0;               //!< Constant offset added to Y values.
-    double z_order = 0.0;                       //!< Rendering priority (higher is on top).
-    QColor color = Qt::transparent;             //!< Curve color.
-    Qt::PenStyle line_style = Qt::SolidLine;    //!< Style of the line (Solid, Dashed, etc).
-    QwtPlotCurve::CurveStyle curve_style = QwtPlotCurve::Lines; //!< Qwt curve drawing style.
-    QwtSymbol::Style symbol_type = QwtSymbol::NoSymbol;         //!< Type of point symbols.
-};
-
-/*!
- * \brief Container for curve data and its associated configuration.
- */
-struct Series {
-    QwtPlotCurve* curve = nullptr;  //!< Pointer to the Qwt curve object.
-    CurveConfig config;                   //!< Style and rendering configuration.
-    std::vector<double> x_data;     //!< Buffer for X-axis coordinates.
-    std::vector<double> y_data;     //!< Buffer for Y-axis coordinates.
-};
-
-/*!
- * \brief Defines how the plot behaves as new data points are added.
- */
-enum ViewMode {
-    CUMULATIVE, //!< Shows all data, expanding the X-axis as needed.
-    ROLLING,    //!< Maintains a fixed window width, shifting with new data.
-    SWEEP,      //!< Clears/re-draws from left to right in discrete pages.
-};
 
 /*!
  * \brief Helper for managing QwtPlot complexity and signal visualization.
@@ -115,7 +67,7 @@ public:
     /*!
      * \brief Sets the plot's horizontal behavior mode.
      */
-    void set_view_mode(ViewMode view_mode);
+    void set_view_mode(PlotMode view_mode);
 
     /*!
      * \brief Enables or disables automatic scaling for the X axis.
@@ -149,6 +101,20 @@ public:
     void set_legend_visible(bool visible);
 
     /*!
+     * \brief Show or hide the plot axes
+     * \param x_axis_visible True to enable the bottom axis.
+     * \param y_axis_visible True to enable the left axis.
+     */
+    void set_axis_visible(bool x_axis_visible, bool y_axis_visible);
+
+    /*!
+     * \brief Show or hide the plot axis titles
+     * \param x_title_visible True to display the X-axis title.
+     * \param y_title_visible True to display the Y-axis title.
+     */
+    void set_axis_titles_visible(bool x_title_visible, bool y_title_visible);
+
+    /*!
      * \brief set_grid_visible Sets the grid visible
      * \param visible True if the grid should be visible
      */
@@ -171,17 +137,64 @@ private:
      */
     void manual_scale(double min_x, double max_x, double min_y, double max_y);
 
+    /*!
+     * \brief Enable or disable the X-axis (bottom)
+     * \param visible True to show the axis, false to hide it.
+     */
+    void set_x_axis_visible(bool visible);
+
+    /*!
+     * \brief Enable or disable the Y-axis (left)
+     * \param visible True to show the axis, false to hide it.
+     */
+    void set_y_axis_visible(bool visible);
+
+    /*!
+     * \brief Toggle the visibility of the X-axis title
+     * \param visible True to display the title, false to clear it.
+     */
+    void set_x_axis_title_visible(bool visible);
+
+    /*!
+     * \brief Toggle the visibility of the Y-axis title
+     * \param visible True to display the title, false to clear it.
+     */
+    void set_y_axis_title_visible(bool visible);
+
+    /*!
+     * \brief Save plot data or visuals
+     * \param file_type The format to export (e.g., CSV or IMAGE).
+     */
+    void save_file(FileType file_type);
+
+    /*!
+     * \brief Export all active series data to a CSV file
+     * \param path System path for the output file.
+     */
+    void export_csv(const QString &path);
+
+    /*!
+     * \brief Save the current plot view as an image
+     * \param path System path for the output image.
+     */
+    void export_image(const QString &path);
+
     bool m_paused;                      //!< Flag for if the plot is paused
     bool m_auto_scale_x;                //!< Flag for X-axis auto-scaling.
     bool m_auto_scale_y;                //!< Flag for Y-axis auto-scaling.
-    ViewMode m_view_mode;               //!< Current horizontal viewing behavior.
+    QString m_x_axis_title;             //!< Title of the X-axis
+    QString m_y_axis_title;             //!< Title of the Y-axis
+    PlotMode m_view_mode;               //!< Current horizontal viewing behavior.
     ScaleDialog *m_scale_diag;          //!< Dialog for manual scale input.
     QwtPlot *m_plot;                    //!< The core QwtPlot widget.
-    QwtPlotLegendItem *m_legend;                //!< The legend of the plot.
+    QwtPlotLegendItem *m_legend;        //!< The legend of the plot.
     QwtPlotGrid *m_grid;                //!< Visual background grid.
     QwtPlotZoomer *m_zoomer;            //!< Zooming interaction handler.
     QwtPlotMagnifier *m_magnifier;      //!< Mouse-wheel magnification handler.
-    std::map<std::string, Series> m_series; //!< Map of IDs to data series objects.
+    MultiSeriesTracker *m_picker;       //!< Displays the point at a picked position
+    std::vector<std::string> m_series_order; //!< The order of insertion for the series
+    std::map<std::string, Series> m_series; //!< Map of IDs to data series.
+    std::map<std::string, StyleCurveDiag*> m_style_dialogs; //!< Map of IDs to data series dialogs.
 };
 
 } // namespace Plot

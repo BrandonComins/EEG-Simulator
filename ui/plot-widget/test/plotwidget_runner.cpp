@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     plot_helper->add_series("Cosine");
     plot_helper->set_scale_x(0, 300);
     plot_helper->set_axis_titles("Samples", "Amplitude");
-    plot_helper->set_view_mode(Plot::ViewMode::ROLLING);
+    plot_helper->set_view_mode(Plot::PlotMode::ROLLING);
 
     QObject::connect(timer, &QTimer::timeout, [&]{
         double sine_y = std::sin(timeouts * 0.1);
