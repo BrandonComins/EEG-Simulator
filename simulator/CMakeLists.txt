@@ -1,21 +1,29 @@
 include_guard(GLOBAL)
 cmake_minimum_required(VERSION 3.28)
 
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
+
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/inc)
+set(INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(SRC
-    eegsimulator.cpp
+    ${SRC_DIR}/commandparser.cpp
+    ${SRC_DIR}/eeg.cpp
 )
 
 set(INC
-    eegsimulator.h
+    ${INC_DIR}/commandparser.h
+    ${INC_DIR}/eeg.h
 )
-
-find_package(Qt6 REQUIRED COMPONENTS Core)
 
 add_executable(${PROJECT_NAME}-simulator ${SRC} ${INC} main.cpp)
 
 target_include_directories(${PROJECT_NAME}-simulator PRIVATE ${INC_DIR})
 
-target_link_libraries(${PROJECT_NAME}-simulator PRIVATE)
+target_link_libraries(${PROJECT_NAME}-simulator PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Network
+    Communication-lib
+)
