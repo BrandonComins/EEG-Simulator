@@ -9,10 +9,10 @@ namespace Plot {
  * \brief A tracker that snaps to the nearest curve point and displays all series values.
  */
 class MultiSeriesTracker : public QwtPlotPicker {
-public:
+  public:
     MultiSeriesTracker(QWidget* canvas);
 
-protected:
+  protected:
     /*!
      * \brief Intercepts movement to snap the cursor position to the nearest data point.
      */

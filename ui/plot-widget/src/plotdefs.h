@@ -64,7 +64,7 @@ struct CurveConfig {
  */
 struct Series {
     QwtPlotCurve* curve = nullptr;  //!< Pointer to the Qwt curve object.
-    CurveConfig config;                   //!< Style and rendering configuration.
+    CurveConfig config;             //!< Style and rendering configuration.
     std::vector<double> x_data;     //!< Buffer for X-axis coordinates.
     std::vector<double> y_data;     //!< Buffer for Y-axis coordinates.
 };

@@ -27,7 +27,7 @@ class ScaleDialog;
 class PlotHelper : public QObject {
     Q_OBJECT
 
-public:
+  public:
     /*!
      * \brief Constructs the PlotHelper.
      * \param frame The QFrame that will contain the QwtPlot.
@@ -125,13 +125,13 @@ public:
      */
     void show_context_menu(const QPoint& pos);
 
-protected:
+  protected:
     /*!
      * \brief Provides access to the underlying QwtPlot widget.
      */
     [[nodiscard]] auto plot() const -> QwtPlot*;
 
-private:
+  private:
     /*!
      * \brief Handler for the manual scale dialog confirmation.
      */

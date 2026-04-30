@@ -34,6 +34,5 @@ void Plot::ScaleDialog::ScaleDialog::handle_scale_button() {
         std::swap(min_y, max_y);
     }
 
-
     Q_EMIT scale_clicked(min_x, max_x, min_y, max_y);
 }
