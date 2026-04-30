@@ -20,7 +20,6 @@ constexpr size_t   MIN_PACKET_SIZE = 15;
 constexpr size_t   MAX_PACKET_SIZE = 128;
 constexpr size_t   HEADER_SYNC_SIZE = 2; // SOF + Length
 
-
 /*!
  * \class PacketTransceiver
  * \brief Handles binary packet serialization and parsing.
@@ -31,26 +30,10 @@ class PacketTransceiver : public QObject {
   public:
     /*!
      * \brief PacketTransceiver Construcs the packet transeriver
-     * \param device A QIO device (Tcp socket, Serial Device, etc)
+     * \param device A QIO device (QTcpSocket, QSerialport, etc)
      * \param parent QObject parent
      */
     explicit PacketTransceiver(QIODevice* device, QObject* parent = nullptr);
-
-    /*!
-     * \brief send_command Send a command
-     * \param cmd Command Type
-     * \param data The payload
-     * \param dataSize The size of the paylaod
-     */
-    void send_command(CommandID cmd, const void* data, size_t data_size);
-
-    /*!
-     * \brief Constructs and sends a Reply packet
-     * \param cmd The Command being acknowledged.
-     * \param data Pointer to the reply payload.
-     * \param data_size Size of the reply payload.
-     */
-    void send_reply(CommandID cmd, const void* data, size_t data_size);
 
     /*!
      * \brief Calculates a checksum for the given data buffer.
@@ -69,6 +52,18 @@ class PacketTransceiver : public QObject {
      */
     uint32_t get_timestamp();
 
+    void send_command(OPCode cmd);
+
+    template <typename T>
+    void send_command(OPCode cmd, const T& payload) {
+        transmit(cmd, ++m_global_packet_count, PACKET_TYPE_REQUEST, payload);
+    }
+
+    template <typename T>
+    void send_reply(OPCode cmd, uint8_t original_req_id, const T& payload) {
+        transmit(cmd, original_req_id, PACKET_TYPE_REPLY, payload);
+    }
+
   Q_SIGNALS:
     /*!
      * \brief Emitted when a validated, complete packet is extracted from the stream.
@@ -77,6 +72,34 @@ class PacketTransceiver : public QObject {
     void packet_received(const QByteArray &packet);
 
   private:
+    template <typename T>
+    void transmit(OPCode cmd, uint8_t req_id, PacketType type, const T& payload) {
+        const uint8_t total_size = sizeof(PacketHeader) + sizeof(OPCode) + sizeof(T) + sizeof(PacketFooter);
+
+        QByteArray buffer;
+        buffer.reserve(total_size);
+
+        PacketHeader header;
+        header.sof = SOF_MARKER;
+        header.packet_length = total_size;
+        header.type = static_cast<uint8_t>(type);
+        header.request_id = req_id;
+        header.timestamp_ms = get_timestamp();
+        header.packet_id = ++m_global_packet_count;
+        buffer.append(reinterpret_cast<const char*>(&header), sizeof(PacketHeader));
+
+        uint8_t op = static_cast<uint8_t>(cmd);
+        buffer.append(reinterpret_cast<const char*>(&op), 1);
+
+        buffer.append(reinterpret_cast<const char*>(&payload), sizeof(T));
+
+        PacketFooter footer;
+        footer.checksum = calculate_checksum(buffer.constData(), buffer.size());
+        footer.footer = EOF_MARKER;
+        buffer.append(reinterpret_cast<const char*>(&footer), sizeof(PacketFooter));
+
+        m_device->write(buffer);
+    }
 
     /*!
      * \brief Internal slot triggered by device's readyRead signal.
@@ -87,41 +110,6 @@ class PacketTransceiver : public QObject {
      * \brief Parses the the packet.
      */
     void process_buffer();
-
-    /*!
-     * \brief Sends a packet.
-     * \tparam T The packet structure type.
-     * \param packet The packet to be sent.
-     */
-    template <typename T>
-    void send_packet(T& packet) {
-        if (!m_device || !m_device->isOpen()) return;
-
-        packet.header.sof = SOF_MARKER;
-        packet.header.packet_length = static_cast<uint8_t>(sizeof(T));
-        packet.footer = EOF_MARKER;
-
-        packet.checksum = calculate_checksum(&packet, sizeof(T));
-
-        m_device->write(reinterpret_cast<const char*>(&packet), sizeof(T));
-    }
-
-    /*!
-     * \brief Populates the common header and ACK fields for a reply packet.
-     * \tparam T The reply packet structure type.
-     * \param packet The packet instance to prepare.
-     * \param cmd The associated command.
-     */
-    template <typename T>
-    void prepare_reply_header(T& packet, CommandID cmd) {
-        packet.header.type = PACKET_TYPE_REPLY;
-        packet.header.request_id = m_last_request_id;
-        packet.header.packet_id = ++m_global_packet_count;
-        packet.header.timestamp_ms = get_timestamp();
-
-        packet.ack.command_id = cmd;
-        packet.ack.status_flags = 0;
-    }
 
     uint32_t m_global_packet_count; //!< Number of packets that have been sent.
     uint8_t m_last_request_id;      //!< The ID of the last received request.

@@ -1,7 +1,7 @@
 include_guard(GLOBAL)
 cmake_minimum_required(VERSION 3.28)
 
-set(NAME Communication)
+set(NAME communication)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)

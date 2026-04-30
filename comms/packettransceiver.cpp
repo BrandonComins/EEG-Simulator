@@ -13,42 +13,6 @@ Communication::PacketTransceiver::PacketTransceiver(QIODevice *device, QObject *
     QObject::connect(m_device, &QIODevice::readyRead, this, &PacketTransceiver::read_data);
 }
 
-void Communication::PacketTransceiver::send_command(CommandID cmd, const void *data, size_t data_size) {
-    GenericCommandRequest request;
-
-    request.header.type = PACKET_TYPE_REQUEST;
-    request.header.request_id = ++m_last_request_id;
-    request.header.packet_id = ++m_global_packet_count;
-    request.header.timestamp_ms = get_timestamp();
-
-    request.command_id = cmd;
-    std::memset(request.payload, 0, sizeof(request.payload));
-
-    if (data && data_size <= sizeof(request.payload)) {
-        std::memcpy(request.payload, data, data_size);
-    } else if (data_size > sizeof(request.payload)) {
-        qDebug() << "Packet Payload Exceeds max size";
-        return;
-    }
-
-    send_packet(request);
-}
-
-void Communication::PacketTransceiver::send_reply(CommandID cmd, const void *data, size_t data_size) {
-    if (cmd == CMD_GET_LATEST_DATA) {
-        EEGDataReply reply;
-        prepare_reply_header(reply, cmd);
-        if (data && data_size == sizeof(reply.channels)) {
-            std::memcpy(reply.channels, data, data_size);
-        }
-        send_packet(reply);
-    } else {
-        GenericStatusReply reply;
-        prepare_reply_header(reply, cmd);
-        send_packet(reply);
-    }
-}
-
 uint16_t Communication::PacketTransceiver::PacketTransceiver::calculate_checksum(const void *data, size_t length) {
     constexpr int footer_check_sum_length = 3;
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(data);
@@ -64,20 +28,18 @@ uint16_t Communication::PacketTransceiver::PacketTransceiver::calculate_checksum
 }
 
 bool Communication::PacketTransceiver::validate_checksum(const QByteArray &packet) {
-    constexpr int footer_check_sum_length = 3;
-
-    if (packet.size() > footer_check_sum_length) {
+    constexpr int checksum_offset_from_end = 3;
+    if (packet.size() > checksum_offset_from_end) {
         uint16_t sent_checksum;
-        std::memcpy(&sent_checksum, packet.data() + packet.size() - footer_check_sum_length, sizeof(uint16_t));
+        uint16_t calculated = calculate_checksum(packet.data(), packet.size() - checksum_offset_from_end);
 
-        uint16_t calculated = calculate_checksum(packet.data(), packet.size());
+        std::memcpy(&sent_checksum, packet.data() + packet.size() - checksum_offset_from_end, sizeof(uint16_t));
 
         return (sent_checksum == calculated);
     }
 
     return false;
 }
-
 void Communication::PacketTransceiver::read_data() {
     QByteArray buffer = m_device->readAll();
     m_incoming_data.append(buffer);
@@ -92,42 +54,56 @@ uint32_t Communication::PacketTransceiver::get_timestamp() {
     return millis;
 }
 
+void Communication::PacketTransceiver::send_command(OPCode cmd) {
+    struct Empty {};
+    send_command(cmd, Empty());
+}
+
 void Communication::PacketTransceiver::process_buffer() {
-    while (m_incoming_data.size() >= HEADER_SYNC_SIZE) {
+    while (m_incoming_data.size() >= static_cast<int>(sizeof(PacketHeader))) {
+        const auto* header = reinterpret_cast<const PacketHeader*>(m_incoming_data.constData());
 
-        if (static_cast<uint8_t>(m_incoming_data[0]) != SOF_MARKER) {
+        //Make sure we found the header at the start of the frame and it is the expected byte
+        if (static_cast<uint8_t>(header->sof) != static_cast<uint8_t>(0xA5)) {
             m_incoming_data.remove(0, 1);
             continue;
         }
 
-        const uint8_t expected_size = static_cast<uint8_t>(m_incoming_data[1]);
+        const uint8_t expected_size = header->packet_length;
 
-        if (expected_size < MIN_PACKET_SIZE || expected_size > MAX_PACKET_SIZE) {
+        //Make sure that the size is within the realm of possibility
+        constexpr uint8_t absolute_min = sizeof(PacketHeader) + 1 + sizeof(PacketFooter);
+        if (expected_size < absolute_min || expected_size > 255) {
             m_incoming_data.remove(0, 1);
             continue;
         }
 
+        //Entire packet hasn't arrived yet
         if (m_incoming_data.size() < expected_size) {
             return;
         }
 
-        const uint8_t footer_byte = static_cast<uint8_t>(m_incoming_data[expected_size - 1]);
-        if (footer_byte != EOF_MARKER) {
+        //Make sure the footer is at the end of the frame and is the expected Byte
+        const uint8_t footer = static_cast<uint8_t>(m_incoming_data.at(expected_size - 1));
+        if (footer != 0x5A) {
             m_incoming_data.remove(0, 1);
             continue;
         }
 
+
+        //Whole packet arrived, make sure checksum is good
         QByteArray packet_raw = m_incoming_data.left(expected_size);
-        m_incoming_data.remove(0, expected_size);
-
         if (validate_checksum(packet_raw)) {
-            const auto* packet_ptr = reinterpret_cast<const PacketHeader*>(packet_raw.data());
 
-            if (packet_ptr->type == PACKET_TYPE_REQUEST) {
-                m_last_request_id = packet_ptr->request_id;
+            if (header->type == PACKET_TYPE_REQUEST) {
+                m_last_request_id = header->request_id;
             }
 
+            m_incoming_data.remove(0, expected_size);
+
             Q_EMIT packet_received(packet_raw);
+        } else {
+            m_incoming_data.remove(0, 1);
         }
     }
 }

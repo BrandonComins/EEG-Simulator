@@ -13,12 +13,18 @@ enum PacketType {
 };
 
 //Command OP Codes. IMPORTANT: Only add new commands to the end of the enum to not break backwards compatability between versions!!!!
-enum CommandID {
+enum OPCode : uint8_t {
     CMD_GET_LATEST_DATA,
-    CMD_SET_ALPHA_PARAMS,
-    CMD_SET_BETA_PARAMS,
-    CMD_SET_NOISE_LEVEL
+    CMD_GET_NUM_CHANNELS,
+    CMD_SET_ALPHA_AMPLITUDE,
+    CMD_SET_ALPHA_FREQUENCY,
+    CMD_SET_BETA_AMPLITUDE,
+    CMD_SET_BETA_FREQUENCY,
+    CMD_SET_NOISE_SCALE,
+    CMD_SET_NOISE_PERSISTANCE,
 };
+
+//!< ----GENERIC----
 
 struct PacketHeader {
     uint8_t  sof;             //!< Start of Frame (0xA5)
@@ -29,52 +35,53 @@ struct PacketHeader {
     uint32_t timestamp_ms;    //!< Device/System time
 }; // 12 Bytes
 
-struct GenericAckReply {
-    uint8_t  command_id;      //!< Which command this reply belongs to
-    uint16_t status_flags;    //!< System health (0 = OK)
+struct PacketFooter {
+    uint16_t checksum;
+    uint8_t  footer;
 }; // 3 Bytes
 
-struct AlphaConfig {
-    float amplitude;          //!< Amplitude of the alpha config
-    float frequency;          //!< Frequency of the alpha config
-}; // 8 Bytes
+struct GenericAck {
+    uint8_t  command_id;     //!< Which command this reply belongs to
+    uint16_t status;         //!< System health (0 = OK)
+}; // 3 Bytes
 
-struct BetaConfig {
-    float amplitude;          //!< Amplitude of the beta config
-    float frequency;          //!< Frequency of the beta config
-}; // 8 Bytes
+//!< ----SET PACKETS----
 
-struct NoiseConfig {
-    float scale;             //!< Noise Scale
+struct Amplitude {
+    float amplitude;         //!< Amplitude of the alpha config
+    uint8_t channel_id;      //!< Channel ID to update
 }; // 4 Bytes
 
-struct GenericCommandRequest {
-    PacketHeader header;      //!< Header metadata
-    uint8_t      command_id;  //!< Command
-    uint8_t      payload[16]; //!< Actual data
-    uint16_t     checksum;    //!< Checksum to verify a valid packet
-    uint8_t      footer;      //!< End of the packet
-}; // 31 Bytes (For Now)
+struct Frequency {
+    float frequency;         //!< Frequency of the alpha config
+    uint8_t channel_id;      //!< Channel ID to update
+}; // 4 Bytes
 
-struct EEGSample {
-    float    value;   //!< Value from the sample
-    uint8_t  quality; //!< Quality of the sample
+struct NoiseScale {
+    float scale;             //!< Noise Scale
+    uint8_t channel_id;      //!< Channel ID to update
+}; // 4 Bytes
+
+struct NoisePersistance {
+    float persistance;       //!< Noise Persistance
+    uint8_t channel_id;      //!< Channel ID to update
 }; // 5 Bytes
 
-struct EEGDataReply {
-    PacketHeader    header;       //!< Header metadata
-    GenericAckReply ack;          //!< Acknowledgement packet
-    EEGSample       channels[11]; //!< Sample data for 11 channels
-    uint16_t        checksum;     //!< Checksum to verify a valid packet
-    uint8_t         footer;       //!< End of the packet
-}; // Total: 72 Bytes
+struct ChannelsCount {
+    uint8_t num_channels;    //!< Actual data
+}; // 1 Byte
 
-struct GenericStatusReply {
-    PacketHeader    header;    //!< Header metadata
-    GenericAckReply ack;       //!< Acknowledgement packet
-    uint16_t        checksum;  //!< Checksum to verify a valid packet
-    uint8_t         footer;    //!< End of the packet
-}; // Total: 17 Bytes
+//!< ----GET PACKETS----
+
+struct RequestSample {
+    uint8_t channel_id;       //!< The channel index being requested
+}; // 1 Byte
+
+struct EEGSample {
+    float    value;     //!< Value from the sample
+    uint8_t  quality;   //!< Quality of the sample
+    uint8_t channel_id; //!< Channel the data is coming from
+}; // 6 Bytes
 
 #pragma pack(pop)
 
