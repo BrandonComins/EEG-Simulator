@@ -25,5 +25,7 @@ target_include_directories(${PROJECT_NAME}-simulator PRIVATE ${INC_DIR})
 target_link_libraries(${PROJECT_NAME}-simulator PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Network
-    Communication-lib
+    communication-lib
 )
+
+target_compile_options(${PROJECT_NAME}-simulator PRIVATE -Wall -Wextra)
