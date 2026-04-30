@@ -1,12 +1,9 @@
 #ifndef EEG_SIMULATOR_H
 #define EEG_SIMULATOR_H
 
-#include <cstddef>
-
 namespace Communication {
 struct EEGSample;
 }
-
 
 /*!
  * \class EEG
@@ -20,30 +17,54 @@ public:
      */
     EEG();
 
-
-    void fill_latest_samples(Communication::EEGSample* channels, size_t count, double time_seconds);
+    /*!
+     * \brief Updates the amplitude for the Alpha rhythm.
+     * \param amplitude The target amplitude in microvolts (uV).
+     */
+    void set_alpha_amplitude(double amplitude_uV);
 
     /*!
-     * \brief Updates the parameters for the Alpha rhythm.
-     * \param amplitude The target amplitude in microvolts (uV).
+     * \brief Updates the frequency for the Alpha rhythm.
      * \param frequency The target frequency in Hertz (Hz).
      */
-    void set_alpha_params(double amplitude, double frequency);
+    void set_alpha_frequency(double frequency_Hz);
 
     /*!
-     * \brief Updates the parameters for the Beta rhythm.
+     * \brief Updates the amplitude for the Beta rhythm.
      * \param amplitude The target amplitude in microvolts (uV).
+     */
+    void set_beta_amplitude(double amplitude_uV);
+
+    /*!
+     * \brief Updates the frequency for the Beta rhythm.
      * \param frequency The target frequency in Hertz (Hz).
      */
-    void set_beta_params(double amplitude, double frequency);
+    void set_beta_frequency(double frequency_Hz);
 
     /*!
      * \brief Sets the intensity of the background noise.
      * \param scale The scaling factor applied to the generated noise.
      */
-    void set_noise_level(double scale);
+    void set_noise_level(double scale_uV);
 
-private:
+    /*!
+     * \brief Sets the noise smoothing coefficient.
+     * \param persistence A ratio (0.0 to 1.0) determining the "pinkness" of the noise.
+     */
+    void set_noise_persistance(double persistance);
+
+    /*!
+     * \brief set_num_channels Set the number of channels in the EEG
+     * \param channels The number of channels
+     */
+    void set_num_channels(int channels);
+
+    /*!
+     * \brief num_channels Get the number of channels
+     * \return The number of channels
+     */
+    [[nodiscard]] auto num_channels() -> int;
+
     /*!
      * \brief Generates a single voltage sample for a given timestamp.
      * \param time_seconds The current simulation time in seconds.
@@ -51,6 +72,7 @@ private:
      */
     double get_next_sample(double time_seconds);
 
+private:
     double m_alpha_amplitude_uv; //!< Amplitude of the Alpha wave in uV.
     double m_alpha_freq_hz;      //!< Frequency of the Alpha wave in Hz.
     double m_beta_amplitude_uv;  //!< Amplitude of the Beta wave in uV.
