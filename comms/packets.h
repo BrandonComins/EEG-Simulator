@@ -12,7 +12,10 @@ enum PacketType {
     PACKET_TYPE_REPLY    // Hardware -> UI
 };
 
-//Command OP Codes. IMPORTANT: Only add new commands to the end of the enum to not break backwards compatability between versions!!!!
+//!< Command OP Codes.
+/* IMPORTANT: Only add new commands to the end of the enum to
+ *  not break backwards compatability between versions!!!!
+ */
 enum OPCode : uint8_t {
     CMD_GET_LATEST_DATA,
     CMD_GET_NUM_CHANNELS,
@@ -50,17 +53,17 @@ struct GenericAck {
 struct Amplitude {
     float amplitude;         //!< Amplitude of the alpha config
     uint8_t channel_id;      //!< Channel ID to update
-}; // 4 Bytes
+}; // 5 Bytes
 
 struct Frequency {
     float frequency;         //!< Frequency of the alpha config
     uint8_t channel_id;      //!< Channel ID to update
-}; // 4 Bytes
+}; // 5 Bytes
 
 struct NoiseScale {
     float scale;             //!< Noise Scale
     uint8_t channel_id;      //!< Channel ID to update
-}; // 4 Bytes
+}; // 5 Bytes
 
 struct NoisePersistance {
     float persistance;       //!< Noise Persistance

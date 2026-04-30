@@ -14,11 +14,8 @@ class QIODevice;
 
 namespace Communication {
 
-constexpr uint8_t  SOF_MARKER = 0xA5;
-constexpr uint8_t  EOF_MARKER = 0x5A;
-constexpr size_t   MIN_PACKET_SIZE = 15;
-constexpr size_t   MAX_PACKET_SIZE = 128;
-constexpr size_t   HEADER_SYNC_SIZE = 2; // SOF + Length
+constexpr uint8_t  SOF_MARKER = 0xA5; //Packet Start of Frame
+constexpr uint8_t  EOF_MARKER = 0x5A; // Packet End of Frame
 
 /*!
  * \class PacketTransceiver
@@ -52,13 +49,28 @@ class PacketTransceiver : public QObject {
      */
     uint32_t get_timestamp();
 
+    /*!
+     * \brief send_command Send a command to the device
+     * \param cmd A command
+     */
     void send_command(OPCode cmd);
 
+    /*!
+     * \brief send_command Send a command with a payload
+     * \param cmd A command with a payload
+     * \param payload The data of the packet
+     */
     template <typename T>
     void send_command(OPCode cmd, const T& payload) {
         transmit(cmd, ++m_global_packet_count, PACKET_TYPE_REQUEST, payload);
     }
 
+    /*!
+     * \brief send_reply Send a reply to a command
+     * \param cmd The command that is expecting a reply
+     * \param original_req_id The id of the command
+     * \param payload The data of the packet
+     */
     template <typename T>
     void send_reply(OPCode cmd, uint8_t original_req_id, const T& payload) {
         transmit(cmd, original_req_id, PACKET_TYPE_REPLY, payload);
@@ -72,6 +84,13 @@ class PacketTransceiver : public QObject {
     void packet_received(const QByteArray &packet);
 
   private:
+    /*!
+     * \brief transmit Send a packet somewhere
+     * \param cmd The command
+     * \param req_id The unique id of the packet
+     * \param type The type of packet (request, reply)
+     * \param payload The data of the packet
+     */
     template <typename T>
     void transmit(OPCode cmd, uint8_t req_id, PacketType type, const T& payload) {
         const uint8_t total_size = sizeof(PacketHeader) + sizeof(OPCode) + sizeof(T) + sizeof(PacketFooter);
@@ -106,7 +125,7 @@ class PacketTransceiver : public QObject {
      */
     void read_data();
 
-      /*!
+    /*!
      * \brief Parses the the packet.
      */
     void process_buffer();
