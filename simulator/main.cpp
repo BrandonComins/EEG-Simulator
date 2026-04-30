@@ -12,11 +12,12 @@ int main(int argc, char *argv[]) {
     constexpr int connect_time_ms = 1000;
     constexpr int port = 1234;
     const QString host_ip = QStringLiteral("127.0.0.1");
+    constexpr int num_channels = 11; //Make Settings File later
 
-    EEG simulator;
+    std::vector<EEG> channels(num_channels);
     QTcpSocket socket;
     Communication::PacketTransceiver transceiver(&socket);
-    Communication::CommandParser parser(&simulator, &transceiver);
+    Communication::CommandParser parser(channels, &transceiver);
 
     auto attempt_connection = [&]() {
         if (socket.state() == QAbstractSocket::UnconnectedState) {
