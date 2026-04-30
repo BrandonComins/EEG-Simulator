@@ -148,7 +148,7 @@ void Plot::PlotHelper::add_point(const std::string &id, double x, double y) {
         auto& series = it->second;
 
         series.x_data.push_back(x);
-        series.y_data.push_back(y);
+        series.y_data.push_back(y + series.config.y_offset);
 
         if(!m_paused) {
             if (m_view_mode == PlotMode::ROLLING || m_view_mode == PlotMode::SWEEP) {

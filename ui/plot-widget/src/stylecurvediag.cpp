@@ -42,6 +42,9 @@ Plot::StyleCurveDiag::StyleCurveDiag(const std::string &id,
     QObject::connect(ui->comboBox_symbol, &QComboBox::activated,
                      this, &StyleCurveDiag::on_ui_changed);
 
+    QObject::connect(ui->doubleSpinBox_y_offset, &QDoubleSpinBox::valueChanged,
+                     this, &StyleCurveDiag::on_ui_changed);
+
     QObject::connect(ui->pushButton_color, &QPushButton::clicked, [&] {
         QColor color = QColorDialog::getColor(m_live_config.color, this);
         if (color.isValid()) {
@@ -67,6 +70,7 @@ void Plot::StyleCurveDiag::sync_ui_to_config() {
 
     ui->checkBox_antialiasing->setChecked(m_live_config.use_antialiasing);
     ui->spinBox_z_order->setValue(m_live_config.z_order);
+    ui->doubleSpinBox_y_offset->setValue(m_live_config.y_offset);
     ui->doubleSpinBox_line_width->setValue(static_cast<double>(m_live_config.line_width));
     ui->comboBox_line_style->setCurrentIndex(static_cast<int>(m_live_config.line_style));
     ui->comboBox_curve_style->setCurrentIndex(static_cast<int>(m_live_config.curve_style) + 1);
@@ -77,6 +81,7 @@ void Plot::StyleCurveDiag::on_ui_changed() {
     //Color is controlled by the color button's slot
     m_live_config.use_antialiasing = ui->checkBox_antialiasing->isChecked();
     m_live_config.z_order          = ui->spinBox_z_order->value();
+    m_live_config.y_offset         = ui->doubleSpinBox_y_offset->value();
     m_live_config.line_width       = static_cast<float>(ui->doubleSpinBox_line_width->value());
     m_live_config.line_style       = static_cast<Qt::PenStyle>(ui->comboBox_line_style->currentIndex());
     m_live_config.curve_style      = static_cast<QwtPlotCurve::CurveStyle>(ui->comboBox_curve_style->currentIndex() - 1);

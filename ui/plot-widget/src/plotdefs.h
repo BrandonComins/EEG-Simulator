@@ -52,6 +52,7 @@ struct CurveConfig {
     bool use_antialiasing = true;               //!< Toggle anti-aliased rendering.
     float line_width = 1.5f;                    //!< Thickness of the curve line.
     double z_order = 0.0;                       //!< Rendering priority (higher is on top).
+    double y_offset = 0.0;                      //!< Offset from the actual Y value
     QColor color = Qt::transparent;             //!< Curve color.
     Qt::PenStyle line_style = Qt::SolidLine;    //!< Style of the line (Solid, Dashed, etc).
     QwtPlotCurve::CurveStyle curve_style = QwtPlotCurve::Lines; //!< Qwt curve drawing style.

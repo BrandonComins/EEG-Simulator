@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>195</width>
-    <height>275</height>
+    <height>309</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -234,6 +234,53 @@
     </layout>
    </item>
    <item row="4" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Z-Order</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="spinBox_z_order"/>
+     </item>
+    </layout>
+   </item>
+   <item row="5" column="0">
+    <layout class="QHBoxLayout" name="horizontalLayout_9">
+     <item>
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Y-Offset</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::TextFormat::AutoText</enum>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_y_offset">
+       <property name="minimum">
+        <double>-10000000000000000.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>10000000000000000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>50.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="6" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
       <widget class="QLabel" name="label_4">
@@ -254,24 +301,7 @@
      </item>
     </layout>
    </item>
-   <item row="5" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
-     <item>
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Z-Order</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QSpinBox" name="spinBox_z_order"/>
-     </item>
-    </layout>
-   </item>
-   <item row="6" column="0">
+   <item row="7" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
       <widget class="QCheckBox" name="checkBox_antialiasing">
@@ -285,7 +315,7 @@
      </item>
     </layout>
    </item>
-   <item row="7" column="0">
+   <item row="8" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton_revert">

@@ -3,19 +3,20 @@ set(CMAKE_AUTOUIC ON)
 
 set(NAME plot-widget)
 set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 add_library(${NAME}-lib STATIC
-    multiseriestracker.cpp
-    multiseriestracker.h
-    plothelper.cpp
-    plothelper.h
-    scaledialog.cpp
-    scaledialog.h
-    scaledialog.ui
-    stylecurvediag.cpp
-    stylecurvediag.h
-    stylecurvediag.ui
-    plotdefs.h
+    ${SRC_DIR}/multiseriestracker.cpp
+    ${SRC_DIR}/multiseriestracker.h
+    ${SRC_DIR}/plothelper.cpp
+    ${SRC_DIR}/plothelper.h
+    ${SRC_DIR}/scaledialog.cpp
+    ${SRC_DIR}/scaledialog.h
+    ${SRC_DIR}/scaledialog.ui
+    ${SRC_DIR}/stylecurvediag.cpp
+    ${SRC_DIR}/stylecurvediag.h
+    ${SRC_DIR}/stylecurvediag.ui
+    ${SRC_DIR}/plotdefs.h
 )
 
 qt_add_resources(${NAME}-lib "styles"
@@ -25,12 +26,12 @@ qt_add_resources(${NAME}-lib "styles"
 )
 
 target_include_directories(${NAME}-lib PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}
+    ${SRC_DIR}
     ${QWT_INCLUDE_DIR}
 )
 
 target_link_libraries(${NAME}-lib PUBLIC
-    Qt6::Widgets
+    Qt${Qt_VERSION_MAJOR}::Widgets
     ${QWT_LIBRARY}
 )
 
