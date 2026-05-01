@@ -8,8 +8,8 @@
 namespace SettingsDefs {
 
     inline QString get_config_dir() {
-        QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) 
-                     + QStringLiteral("/EEG_Project/settings");
+        QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation)
+                     + QStringLiteral("/EEG/simulator/settings");
         QDir().mkpath(path);
         return path;
     }
