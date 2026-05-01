@@ -3,12 +3,16 @@
 #include "fmt/base.h"
 #include "packettransceiver.h"
 #include "settings_defs.h"
+#include "spdlog/async.h"
+#include "spdlog/sinks/basic_file_sink.h"
 
+#include <spdlog/spdlog.h>
 #include <QSettings>
 #include <QCoreApplication>
 #include <QTcpSocket>
 #include <QTimer>
 #include <QStandardPaths>
+#include <QDir>
 
 void synchronize_master_settings() {
     const QString settings_path = SettingsDefs::get_common_settings_path();
@@ -32,6 +36,42 @@ void synchronize_master_settings() {
     if (needs_sync) {
         settings.sync();
     }
+}
+
+void init_logging(int num_channels) {
+    QString path = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
+    QString log_dir = path + "/EEG/simulator/logs";
+
+    if (!QDir(log_dir).exists()) {
+        QDir().mkpath(log_dir);
+    }
+
+    constexpr int queue_size = 8192;
+    constexpr int worker_threads = 1;
+    spdlog::init_thread_pool(queue_size, worker_threads);
+
+    const bool clear_on_start = true;
+    auto log_path = (log_dir + "/channels.log").toStdString();
+    auto async_file = spdlog::basic_logger_mt<spdlog::async_factory>(
+        "channel_logger",
+        log_path,
+        clear_on_start
+        );
+
+    spdlog::set_default_logger(async_file);
+
+    spdlog::set_pattern("%v");
+
+    std::string keys = "Time";
+    for(int id = 0; id < num_channels; ++id) {
+        keys+=fmt::format(", CH_{}", id);
+    }
+
+    constexpr int time_seconds = 3;
+    spdlog::info(keys);
+    spdlog::flush_every(std::chrono::seconds(time_seconds));
+
+    fmt::println("Logging initialized at: {}", log_path);
 }
 
 int main(int argc, char *argv[]) {
@@ -66,6 +106,8 @@ int main(int argc, char *argv[]) {
             socket.connectToHost(host_ip, port);
         }
     };
+
+    init_logging(num_channels);
 
     QObject::connect(&transceiver, &Communication::PacketTransceiver::packet_received,
                      &parser, &Communication::CommandParser::process_raw_packet);

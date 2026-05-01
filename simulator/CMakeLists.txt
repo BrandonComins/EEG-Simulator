@@ -24,6 +24,7 @@ target_link_libraries(${PROJECT_NAME}-simulator PRIVATE
     Qt${QT_VERSION_MAJOR}::Network
     communication-lib
     fmt
+    spdlog
 )
 
 target_compile_options(${PROJECT_NAME}-simulator PRIVATE -Wall -Wextra)

@@ -1,5 +1,6 @@
 #include "eeg.h"
 #include "settings_defs.h"
+#include "spdlog/spdlog.h"
 
 #include <algorithm>
 #include <cmath>

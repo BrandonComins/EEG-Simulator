@@ -1,13 +1,16 @@
 #include "commandparser.h"
 #include "eeg.h"
 #include "fmt/base.h"
+#include "fmt/ranges.h"
 #include "packets.h"
 #include "packettransceiver.h"
+#include "spdlog/spdlog.h"
 
 namespace Communication {
 
 CommandParser::CommandParser(const std::vector<EEG*> &channels, PacketTransceiver *transceiver)
-    : m_transceiver(transceiver)
+    : m_log_buffer(channels.size())
+    , m_transceiver(transceiver)
     , m_channels(channels) {
     /* empty */
 }
@@ -79,13 +82,19 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
         }
 
         constexpr double ms_to_s = 1000.0;
-        constexpr int sample_quality = 100; //Don't hardcode me later
+        constexpr int sample_quality = 100;
         const double timestamp_secs = static_cast<double>(m_transceiver->get_timestamp()) / ms_to_s;
 
         EEGSample reply;
         reply.value = m_channels[channel]->get_next_sample(timestamp_secs);
         reply.quality = sample_quality;
         reply.channel_id = channel;
+
+        m_log_buffer[channel] = reply.value;
+
+        if (channel == m_channels.size() - 1) {
+            spdlog::info("{:.4f}, {}", timestamp_secs, fmt::join(m_log_buffer, ", "));
+        }
 
         m_transceiver->send_reply(cmd, req_id, reply);
 

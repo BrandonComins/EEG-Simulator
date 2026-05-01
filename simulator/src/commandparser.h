@@ -44,8 +44,9 @@ class CommandParser : public QObject {
     bool execute_command(OPCode cmd, const PacketHeader& header, const char* payload);
 
   private:
+    std::vector<double> m_log_buffer; //!< Info holding samples to be logged
     PacketTransceiver *m_transceiver; //!< Pointer to the packet tranceivers
-    std::vector<EEG*> m_channels;    //!< Pointer to the vector holding the channel
+    std::vector<EEG*> m_channels;     //!< Pointer to the vector holding the channel
 };
 } //namespace Communication
 
