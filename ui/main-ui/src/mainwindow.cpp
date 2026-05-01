@@ -27,10 +27,14 @@ MainWindow::MainWindow(QWidget *parent)
     m_plot->set_scale_x(0, 6);
     m_plot->set_scale_y(-100, 1100);
 
-    m_server->setMaxPendingConnections(1);
+    ui->action_connect->setShortcut(QKeySequence("Ctrl+C"));
+    ui->action_quick_start->setShortcut(QKeySequence("Ctrl+Shift+C"));
+
+    QObject::connect(ui->action_quick_start, &QAction::triggered,
+                     m_connection_dialog, &ConnectionDialog::toggle_server) ;
 
     QObject::connect(ui->action_connect, &QAction::triggered,
-            m_connection_dialog, &ConnectionDialog::show);
+            m_connection_dialog, &ConnectionDialog::show, Qt::UniqueConnection);
 
     QObject::connect(m_connection_dialog, &ConnectionDialog::start_server_requested,
             this, [&](int port) {

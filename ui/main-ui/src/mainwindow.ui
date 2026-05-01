@@ -65,6 +65,7 @@
      <string>File</string>
     </property>
     <addaction name="action_connect"/>
+    <addaction name="action_quick_start"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -72,6 +73,11 @@
   <action name="action_connect">
    <property name="text">
     <string>Connect</string>
+   </property>
+  </action>
+  <action name="action_quick_start">
+   <property name="text">
+    <string>Quick Start</string>
    </property>
   </action>
  </widget>
