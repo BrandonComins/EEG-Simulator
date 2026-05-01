@@ -6,21 +6,18 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(INC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(SRC
     ${SRC_DIR}/commandparser.cpp
     ${SRC_DIR}/eeg.cpp
+    ${SRC_DIR}/commandparser.h
+    ${SRC_DIR}/eeg.h
+    ${SRC_DIR}/settings_defs.h
 )
 
-set(INC
-    ${INC_DIR}/commandparser.h
-    ${INC_DIR}/eeg.h
-)
+add_executable(${PROJECT_NAME}-simulator ${SRC} main.cpp)
 
-add_executable(${PROJECT_NAME}-simulator ${SRC} ${INC} main.cpp)
-
-target_include_directories(${PROJECT_NAME}-simulator PRIVATE ${INC_DIR})
+target_include_directories(${PROJECT_NAME}-simulator PRIVATE ${SRC_DIR})
 
 target_link_libraries(${PROJECT_NAME}-simulator PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
