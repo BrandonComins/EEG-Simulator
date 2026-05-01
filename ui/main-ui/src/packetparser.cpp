@@ -1,8 +1,8 @@
 #include "packetparser.h"
 
+#include "fmt/base.h"
 #include "plotdefs.h"
 
-#include <QDebug>
 #include <QTcpSocket>
 
 PacketParser::PacketParser(QObject *parent)
@@ -34,7 +34,7 @@ void PacketParser::process_incoming_packet(const QByteArray &data) {
                 break;
 
             default:
-                qDebug() << "UI received reply for unhandled command:" << static_cast<uint8_t>(cmd);
+                fmt::println("UI received reply for unhandled command:", static_cast<uint8_t>(cmd));
                 break;
             }
         }
@@ -58,7 +58,7 @@ void PacketParser::handle_channel_count(const char *payload) {
     const auto* reply = reinterpret_cast<const Communication::ChannelsCount*>(payload);
 
     m_num_channels = static_cast<int>(reply->num_channels);
-    qDebug() << "UI synced: Hardware reporting" << m_num_channels << "channels.";
+    fmt::println("UI synced: Hardware reporting {} channels.", m_num_channels);
 
     for(int channel = 0; channel < m_num_channels; ++channel) {
         constexpr int y_offset = 100;

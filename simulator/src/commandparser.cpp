@@ -1,9 +1,8 @@
 #include "commandparser.h"
 #include "eeg.h"
+#include "fmt/base.h"
 #include "packets.h"
 #include "packettransceiver.h"
-
-#include <QDebug>
 
 namespace Communication {
 
@@ -72,10 +71,10 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
 
     case CMD_GET_LATEST_DATA: {
         const auto* req = reinterpret_cast<const RequestSample*>(payload);
-        uint8_t ch = req->channel_id;
+        uint8_t channel = req->channel_id;
 
-        if (ch >= m_channels.size()) {
-            qWarning() << "UI requested invalid channel:" << ch;
+        if (channel >= m_channels.size()) {
+            fmt::println("UI requested invalid channel: {}", channel);
             return false;
         }
 
@@ -84,9 +83,9 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
         const double timestamp_secs = static_cast<double>(m_transceiver->get_timestamp()) / ms_to_s;
 
         EEGSample reply;
-        reply.value = m_channels[ch]->get_next_sample(timestamp_secs);
+        reply.value = m_channels[channel]->get_next_sample(timestamp_secs);
         reply.quality = sample_quality;
-        reply.channel_id = ch;
+        reply.channel_id = channel;
 
         m_transceiver->send_reply(cmd, req_id, reply);
 
@@ -94,7 +93,7 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
     }
 
     default:
-        qWarning() << "Received unknown Command ID:" << static_cast<uint8_t>(cmd);
+        fmt::println("Received unknown Command ID: {}", static_cast<int>(cmd));
         return false;
     }
 

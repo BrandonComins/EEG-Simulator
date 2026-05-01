@@ -31,6 +31,7 @@ target_link_libraries(${PROJECT_NAME}-ui PRIVATE
     Qt${QT_VERSION_MAJOR}::Network
     plot-widget-lib
     communication-lib
+    fmt
 )
 
 target_compile_options(${PROJECT_NAME}-ui PRIVATE -Wall -Wextra)

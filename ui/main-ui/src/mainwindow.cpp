@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "connectiondialog.h"
+#include "fmt/base.h"
 #include "packetparser.h"
 #include "plothelper.h"
 #include "ui_mainwindow.h"
@@ -8,7 +9,6 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QTimer>
-#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -40,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, [&](int port) {
                 if (!m_server->isListening()) {
                     if (m_server->listen(QHostAddress::Any, port)) {
-                        qDebug() << "Server listening on port" << port;
+                        fmt::println("Server listening on port {}", port);
                     }
                 }
             });

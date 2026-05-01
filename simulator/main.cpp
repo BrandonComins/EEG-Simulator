@@ -1,5 +1,6 @@
 #include "commandparser.h"
 #include "eeg.h"
+#include "fmt/base.h"
 #include "packettransceiver.h"
 #include "settings_defs.h"
 
@@ -36,8 +37,6 @@ void synchronize_master_settings() {
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
 
-    std::srand(static_cast<unsigned int>(std::time(nullptr)));
-
     synchronize_master_settings();
 
     QSettings common_settings(SettingsDefs::get_common_settings_path(), QSettings::IniFormat);
@@ -63,8 +62,7 @@ int main(int argc, char *argv[]) {
 
     auto attempt_connection = [&]() {
         if (socket.state() == QAbstractSocket::UnconnectedState) {
-            qDebug() << QStringLiteral("Attempting to connect to Host at (%1, %2)")
-                            .arg(host_ip).arg(port);
+            fmt::println("Attempting to connect to Host at ({}, {})", host_ip.toStdString(), port);
             socket.connectToHost(host_ip, port);
         }
     };
@@ -73,7 +71,7 @@ int main(int argc, char *argv[]) {
                      &parser, &Communication::CommandParser::process_raw_packet);
 
     QObject::connect(&socket, &QTcpSocket::disconnected, [&]() {
-        qDebug() << "Disconnected! Retrying...";
+        fmt::println("Disconnected! Retrying...");
         QTimer::singleShot(connect_time_ms, attempt_connection);
     });
 

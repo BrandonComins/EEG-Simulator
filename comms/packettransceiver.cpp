@@ -2,7 +2,6 @@
 #include "packets.h"
 
 #include <chrono>
-#include <qdebug.h>
 
 Communication::PacketTransceiver::PacketTransceiver(QIODevice *device, QObject *parent)
     : QObject(parent)
