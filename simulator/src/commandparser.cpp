@@ -7,11 +7,12 @@
 
 namespace Communication {
 
-CommandParser::CommandParser(std::vector<EEG> &channels, PacketTransceiver *transceiver)
+CommandParser::CommandParser(const std::vector<EEG*> &channels, PacketTransceiver *transceiver)
     : m_transceiver(transceiver)
     , m_channels(channels) {
     /* empty */
 }
+
 
 void CommandParser::process_raw_packet(const QByteArray &data) {
     if (data.size() >= static_cast<int>(sizeof(PacketHeader) + sizeof(OPCode))) {
@@ -28,42 +29,42 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
 
     switch (cmd) {
 
-    case CMD_SET_ALPHA_AMPLITUDE: {
-        const auto* pkt = reinterpret_cast<const Amplitude*>(payload);
-        if (pkt->channel_id < m_channels.size()) {
-            m_channels.at(pkt->channel_id).set_alpha_amplitude(pkt->amplitude);
-            m_transceiver->send_reply(cmd, req_id, GenericAck{cmd, 0});
+    case CMD_SET_CHANNEL_CONSTANTS: {
+        const auto* pkt = reinterpret_cast<const ChannelConstants*>(payload);
+        auto &channel = m_channels.at(pkt->channel_id);
 
-            return true;
-        }
-        break;
+        channel->set_alpha_amplitude(pkt->alpha_amplitude);
+        channel->set_alpha_frequency(pkt->alpha_frequency);
+        channel->set_beta_amplitude(pkt->beta_amplitude);
+        channel->set_beta_frequency(pkt->beta_frequency);
+        channel->set_noise_level(pkt->noise_level);
+        channel->set_noise_persistence(pkt->noise_persistence);
+
+        return true;
     }
 
-    case CMD_SET_ALPHA_FREQUENCY: {
-        const auto* pkt = reinterpret_cast<const Frequency*>(payload);
-        if (pkt->channel_id < m_channels.size()) {
-            m_channels.at(pkt->channel_id).set_alpha_frequency(pkt->frequency);
-            m_transceiver->send_reply(cmd, req_id, GenericAck{cmd, 0});
+    case CMD_GET_CHANNEL_CONSTANTS: {
+        const auto* pkt = reinterpret_cast<const RequestChannelConstants*>(payload);
+        auto &channel = m_channels.at(pkt->channel_id);
 
-            return true;
-        }
-        break;
-    }
+        ChannelConstants reply;
+        reply.channel_id = pkt->channel_id;
+        reply.alpha_amplitude = channel->alpha_amplitude_uv();
+        reply.alpha_frequency = channel->alpha_freq_hz();
+        reply.beta_amplitude = channel->beta_amplitude_uv();
+        reply.beta_frequency = channel->beta_freq_hz();
+        reply.noise_persistence = channel->noise_persistence();
+        reply.noise_level = channel->noise_level();
 
-    case CMD_SET_NOISE_SCALE: {
-        const auto* pkt = reinterpret_cast<const NoiseScale*>(payload);
-        if (pkt->channel_id < m_channels.size()) {
-            m_channels.at(pkt->channel_id).set_noise_level(pkt->scale);
-            m_transceiver->send_reply(cmd, req_id, GenericAck{cmd, 0});
+        m_transceiver->send_reply(cmd, req_id, reply);
 
-            return true;
-        }
-        break;
+        return true;
     }
 
     case CMD_GET_NUM_CHANNELS: {
         ChannelsCount data;
         data.num_channels = static_cast<uint8_t>(m_channels.size());
+
         m_transceiver->send_reply(cmd, req_id, data);
 
         return true;
@@ -79,15 +80,16 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
         }
 
         constexpr double ms_to_s = 1000.0;
-        const double timestamp_secs = static_cast<double>(m_transceiver->get_timestamp()) / ms_to_s;
         constexpr int sample_quality = 100; //Don't hardcode me later
+        const double timestamp_secs = static_cast<double>(m_transceiver->get_timestamp()) / ms_to_s;
 
-        EEGSample sample;
-        sample.value = m_channels[ch].get_next_sample(timestamp_secs);
-        sample.quality = sample_quality;
-        sample.channel_id = ch;
+        EEGSample reply;
+        reply.value = m_channels[ch]->get_next_sample(timestamp_secs);
+        reply.quality = sample_quality;
+        reply.channel_id = ch;
 
-        m_transceiver->send_reply(cmd, req_id, sample);
+        m_transceiver->send_reply(cmd, req_id, reply);
+
         return true;
     }
 

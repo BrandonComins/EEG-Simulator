@@ -12,6 +12,7 @@ class FlowLayout;
 
 namespace Communication {
 class PacketTransceiver;
+struct ChannelConstants;
 }
 
 class ControlTab : public QWidget
@@ -33,6 +34,12 @@ public:
     void add_transceiver(Communication::PacketTransceiver *packet_transceiver);
 
     /*!
+     * \brief update_channel_constants Update the channel constants in the UI
+     * \param constants The channel constants from the device
+     */
+    void update_channel_constants(const Communication::ChannelConstants &constants);
+
+    /*!
      * \brief on_connection This function is run when a device is connected;
      */
     void on_connection();
@@ -40,9 +47,24 @@ public:
     /*!
      * \brief on_disconnect This function is run when a device is disconnected
      */
-    void on_disconnect();
+    void on_disconnect();    
 
 private:
+    /*!
+     * \brief send_channel_constants Update the channel constants from the device
+     */
+    void send_channel_constants();
+
+    /*!
+     * \brief request_channel_constants Request the channel constants from the device
+     */
+    void request_channel_constants();
+
+    /*!
+     * \brief request_channel_constants Request the channel constants from the device
+     */
+    void request_channel_constants(int channel_id);
+
     /*!
      * \brief request_latest_data Request the lastest channel data from the device
      */

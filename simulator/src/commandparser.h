@@ -25,8 +25,8 @@ class CommandParser : public QObject {
      * \brief Constructs the parser with a reference to the simulator instance.
      * \param simulator A reference to the EEGSimulator to be controlled.
      */
-    explicit CommandParser(std::vector<EEG> &channels, PacketTransceiver *transceiver);
-      ~CommandParser() = default;
+    explicit CommandParser(const std::vector<EEG*> &channels, PacketTransceiver *transceiver);
+    ~CommandParser() = default;
 
     /*!
      * \brief process_raw_packet Processes a raw packet
@@ -44,8 +44,8 @@ class CommandParser : public QObject {
     bool execute_command(OPCode cmd, const PacketHeader& header, const char* payload);
 
   private:
-    PacketTransceiver *m_transceiver; //!< Pointer to the packet tranceiver
-    std::vector<EEG>& m_channels;     //!< Pointer to the vector holding the channel 
+    PacketTransceiver *m_transceiver; //!< Pointer to the packet tranceivers
+    std::vector<EEG*> m_channels;    //!< Pointer to the vector holding the channel
 };
 } //namespace Communication
 

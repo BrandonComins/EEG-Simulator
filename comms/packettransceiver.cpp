@@ -90,7 +90,6 @@ void Communication::PacketTransceiver::process_buffer() {
             continue;
         }
 
-
         //Whole packet arrived, make sure checksum is good
         QByteArray packet_raw = m_incoming_data.left(expected_size);
         if (validate_checksum(packet_raw)) {

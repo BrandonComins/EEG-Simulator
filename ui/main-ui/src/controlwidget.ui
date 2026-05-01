@@ -137,7 +137,7 @@
          <item row="0" column="2">
           <widget class="QLabel" name="label_6">
            <property name="text">
-            <string>Persistance</string>
+            <string>Persistence</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
@@ -148,7 +148,7 @@
           <widget class="QDoubleSpinBox" name="doubleSpinBox_noise_scale"/>
          </item>
          <item row="0" column="3">
-          <widget class="QDoubleSpinBox" name="doubleSpinBox_noise_persistance"/>
+          <widget class="QDoubleSpinBox" name="doubleSpinBox_noise_persistence"/>
          </item>
         </layout>
        </widget>

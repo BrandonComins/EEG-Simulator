@@ -1,10 +1,13 @@
 #include "packetparser.h"
-#include <QDebug>
+
 #include "plotdefs.h"
+
+#include <QDebug>
+#include <QTcpSocket>
 
 PacketParser::PacketParser(QObject *parent)
     : QObject(parent)
-    , m_num_channels(0) {
+    , m_num_channels(0){
 
     /*empty*/
 }
@@ -15,15 +18,19 @@ void PacketParser::process_incoming_packet(const QByteArray &data) {
 
         if (header->type == Communication::PACKET_TYPE_REPLY) {
             auto cmd = static_cast<Communication::OPCode>(data.at(sizeof(Communication::PacketHeader)));
-            const char* payload_ptr = data.constData() + sizeof(Communication::PacketHeader) + sizeof(Communication::OPCode);
+            const char* payload = data.constData() + sizeof(Communication::PacketHeader) + sizeof(Communication::OPCode);
 
             switch (cmd) {
             case Communication::CMD_GET_LATEST_DATA:
-                handle_eeg_data(header, payload_ptr);
+                handle_eeg_data(header, payload);
                 break;
 
             case Communication::CMD_GET_NUM_CHANNELS:
-                handle_channel_count(payload_ptr);
+                handle_channel_count(payload);
+                break;
+
+            case Communication::CMD_GET_CHANNEL_CONSTANTS:
+                handle_channel_constants(payload);
                 break;
 
             default:
@@ -54,7 +61,7 @@ void PacketParser::handle_channel_count(const char *payload) {
     qDebug() << "UI synced: Hardware reporting" << m_num_channels << "channels.";
 
     for(int channel = 0; channel < m_num_channels; ++channel) {
-        constexpr int y_offset = 50;
+        constexpr int y_offset = 100;
         Plot::CurveConfig config;
         config.y_offset = channel * y_offset;
 
@@ -62,4 +69,11 @@ void PacketParser::handle_channel_count(const char *payload) {
 
         Q_EMIT got_new_channel(get_channel_name(channel), config);
     }
+}
+
+void PacketParser::handle_channel_constants(const char *payload) {
+    Communication::ChannelConstants reply;
+    std::memcpy(&reply, payload, sizeof(Communication::ChannelConstants));
+
+    Q_EMIT got_channel_constants(reply);
 }

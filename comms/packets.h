@@ -5,27 +5,23 @@
 
 namespace Communication {
 
-#pragma pack(push, 1)
-
 enum PacketType {
-    PACKET_TYPE_REQUEST, // UI -> Hardware
-    PACKET_TYPE_REPLY    // Hardware -> UI
+    PACKET_TYPE_REQUEST, //!< UI -> Hardware
+    PACKET_TYPE_REPLY    //!< Hardware -> UI
 };
 
-//!< Command OP Codes.
+
 /* IMPORTANT: Only add new commands to the end of the enum to
  *  not break backwards compatability between versions!!!!
  */
 enum OPCode : uint8_t {
     CMD_GET_LATEST_DATA,
     CMD_GET_NUM_CHANNELS,
-    CMD_SET_ALPHA_AMPLITUDE,
-    CMD_SET_ALPHA_FREQUENCY,
-    CMD_SET_BETA_AMPLITUDE,
-    CMD_SET_BETA_FREQUENCY,
-    CMD_SET_NOISE_SCALE,
-    CMD_SET_NOISE_PERSISTANCE,
+    CMD_GET_CHANNEL_CONSTANTS,
+    CMD_SET_CHANNEL_CONSTANTS,
 };
+
+#pragma pack(push, 1)
 
 //!< ----GENERIC----
 
@@ -50,34 +46,18 @@ struct GenericAck {
 
 //!< ----SET PACKETS----
 
-struct Amplitude {
-    float amplitude;         //!< Amplitude of the alpha config
-    uint8_t channel_id;      //!< Channel ID to update
-}; // 5 Bytes
-
-struct Frequency {
-    float frequency;         //!< Frequency of the alpha config
-    uint8_t channel_id;      //!< Channel ID to update
-}; // 5 Bytes
-
-struct NoiseScale {
-    float scale;             //!< Noise Scale
-    uint8_t channel_id;      //!< Channel ID to update
-}; // 5 Bytes
-
-struct NoisePersistance {
-    float persistance;       //!< Noise Persistance
-    uint8_t channel_id;      //!< Channel ID to update
-}; // 5 Bytes
-
 struct ChannelsCount {
     uint8_t num_channels;    //!< Actual data
 }; // 1 Byte
 
 //!< ----GET PACKETS----
 
+struct RequestChannelConstants {
+    uint8_t channel_id;      //!< The channel index being requested
+}; // 1 Byte
+
 struct RequestSample {
-    uint8_t channel_id;       //!< The channel index being requested
+    uint8_t channel_id;      //!< The channel index being requested
 }; // 1 Byte
 
 struct EEGSample {
@@ -85,6 +65,18 @@ struct EEGSample {
     uint8_t  quality;   //!< Quality of the sample
     uint8_t channel_id; //!< Channel the data is coming from
 }; // 6 Bytes
+
+//!< ---- SET & GET PACKETS ----
+
+struct ChannelConstants {
+    float alpha_frequency;   //!< Frequency of the alpha config
+    float alpha_amplitude;   //!< Amplitude of the alpha config
+    float beta_frequency;    //!< Frequency of the beta config
+    float beta_amplitude;    //!< Amplitude of the beta config
+    float noise_level;       //!< Noise Scale
+    float noise_persistence; //!< Noise Persistence
+    uint8_t channel_id;      //!< Channel ID to update
+}; // 25 Bytes
 
 #pragma pack(pop)
 

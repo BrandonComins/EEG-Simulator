@@ -25,7 +25,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_plot = new Plot::PlotHelper(ui->frame, this);
     m_plot->set_view_mode(Plot::ROLLING);
     m_plot->set_scale_x(0, 6);
-    m_plot->set_scale_y(-50, 550);
+    m_plot->set_scale_y(-100, 1100);
 
     m_server->setMaxPendingConnections(1);
 
@@ -60,6 +60,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(m_packet_parser, &PacketParser::got_channel_data, m_plot,
                      &Plot::PlotHelper::add_point, Qt::UniqueConnection);
+
+    QObject::connect(m_packet_parser, &PacketParser::got_channel_constants,
+                     ui->widget_control_tab, &ControlTab::update_channel_constants, Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow() {
