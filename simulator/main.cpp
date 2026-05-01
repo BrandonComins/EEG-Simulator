@@ -13,6 +13,7 @@
 #include <QTimer>
 #include <QStandardPaths>
 #include <QDir>
+#include <QLockFile>
 
 void synchronize_master_settings() {
     const QString settings_path = SettingsDefs::get_common_settings_path();
@@ -76,6 +77,15 @@ void init_logging(int num_channels) {
 
 int main(int argc, char *argv[]) {
     QCoreApplication app(argc, argv);
+    QString lock_path = QDir::tempPath() + "/EEG-sim.lock";
+    QLockFile lock_file(lock_path);
+
+    constexpr int time_ms = 100;
+    if(!lock_file.tryLock(time_ms)) {
+        fmt::println("CRITICAL: Another instance of the EEG Simulator is already running.");
+        app.exit(1);
+        exit(1);
+    }
 
     synchronize_master_settings();
 
@@ -117,7 +127,7 @@ int main(int argc, char *argv[]) {
         QTimer::singleShot(connect_time_ms, attempt_connection);
     });
 
-    QObject::connect(&socket, &QTcpSocket::errorOccurred, [&](QAbstractSocket::SocketError) {
+    QObject::connect(&socket, &QTcpSocket::errorOccurred, [&] {
         if (socket.state() == QAbstractSocket::UnconnectedState) {
             QTimer::singleShot(connect_time_ms, attempt_connection);
         }
