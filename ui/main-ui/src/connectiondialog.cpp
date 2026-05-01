@@ -1,16 +1,24 @@
 #include "connectiondialog.h"
 #include "ui_connectiondialog.h"
 
+#include <QSettings>
+
+constexpr int default_port = 1234;
+
 ConnectionDialog::ConnectionDialog(QWidget *parent)
     : QDialog(parent)
     , m_server_on(false)
+    , m_settings(new QSettings(QStringLiteral("EEG"), QStringLiteral("Ui Connection"), this))
     , ui(new Ui::ConnectionDialog)
 {
     ui->setupUi(this);
 
-    this->setWindowTitle(QStringLiteral("Connection Dialog"));
+    setWindowTitle(QStringLiteral("Connection Dialog"));
 
     set_led_status(false);
+
+    int saved_port = m_settings->value("last_used_port", default_port).toInt();
+    ui->spinBox_port->setValue(saved_port);
 
     QObject::connect(ui->pushButton_connect, &QPushButton::clicked,
                      this, &ConnectionDialog::toggle_server);
@@ -33,6 +41,10 @@ void ConnectionDialog::toggle_server() {
         m_server_on = true;
         ui->pushButton_connect->setText(QStringLiteral("Stop Server"));
         Q_EMIT start_server_requested(ui->spinBox_port->value());
+
+        // Save the last used port
+        m_settings->setValue("last_used_port", ui->spinBox_port->value());
+        m_settings->sync();
     } else {
         m_server_on = false;
         set_led_status(false);

@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class QSettings;
+
 namespace Ui {
 class ConnectionDialog;
 }
@@ -62,6 +64,7 @@ private:
     void set_led_status(bool connected);
 
     bool m_server_on;            //!< Tracks whether the server listener is active.
+    QSettings *m_settings;       //!< Settings to remember the port
     Ui::ConnectionDialog *ui;    //!< Pointer to the Ui.
 };
 
