@@ -1,10 +1,11 @@
+#include "plothelper.h"
+
 #include <QApplication>
-#include <QTimer>
 #include <QFrame>
 #include <QGridLayout>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <cmath>
-#include "plothelper.h"
 
 int timeouts = 0;
 
@@ -33,7 +34,7 @@ int main(int argc, char *argv[]) {
     plot_helper->set_axis_titles("Samples", "Amplitude");
     plot_helper->set_view_mode(Plot::PlotMode::ROLLING);
 
-    QObject::connect(timer, &QTimer::timeout, [&]{
+    QObject::connect(timer, &QTimer::timeout, [&] {
         double sine_y = std::sin(timeouts * 0.1);
         double cosine_y = std::cos(timeouts * 0.1);
 

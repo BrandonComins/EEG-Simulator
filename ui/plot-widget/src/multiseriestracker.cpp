@@ -1,19 +1,20 @@
 #include "multiseriestracker.h"
+
 #include "qwt_text.h"
-#include <qwt_plot.h>
-#include <qwt_plot_curve.h>
-#include <qwt_plot_item.h>
-#include <qwt_picker_machine.h>
-#include <qwt_plot_dict.h>
-#include <qwt_scale_map.h>
-#include <qwt_scale_div.h>
+
+#include <QCursor>
 #include <QFont>
 #include <QPen>
-#include <QCursor>
+#include <qwt_picker_machine.h>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <qwt_plot_dict.h>
+#include <qwt_plot_item.h>
+#include <qwt_scale_div.h>
+#include <qwt_scale_map.h>
 
 Plot::MultiSeriesTracker::MultiSeriesTracker(QWidget *canvas)
-    : QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
-                    QwtPlotPicker::VLineRubberBand,
+    : QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft, QwtPlotPicker::VLineRubberBand,
                     QwtPicker::AlwaysOn, canvas) {
 
     setStateMachine(new QwtPickerTrackerMachine());
@@ -32,9 +33,9 @@ void Plot::MultiSeriesTracker::move(const QPoint &pos) {
         int target_y_pixel = -1;
         double min_x_dist = std::numeric_limits<double>::max();
 
-        for (const QwtPlotItem* item : items) {
+        for (const QwtPlotItem *item : items) {
             if (item->isVisible()) {
-                const auto* curve = static_cast<const QwtPlotCurve*>(item);
+                const auto *curve = static_cast<const QwtPlotCurve *>(item);
                 double dist;
                 int index = curve->closestPoint(QPointF(mouse_data_x, 0.0), &dist);
 
@@ -71,9 +72,9 @@ QwtText Plot::MultiSeriesTracker::trackerTextF(const QPointF &pos) const {
         const QwtScaleMap x_map = plot()->canvasMap(xAxis());
         int mouse_pixel_x = x_map.transform(pos.x());
 
-        for (const QwtPlotItem* item : items) {
+        for (const QwtPlotItem *item : items) {
             if (item->isVisible()) {
-                const auto* curve = static_cast<const QwtPlotCurve*>(item);
+                const auto *curve = static_cast<const QwtPlotCurve *>(item);
                 int index = -1;
                 double min_pixel_dist = pixel_threshold;
                 QPointF found_sample;
@@ -92,8 +93,8 @@ QwtText Plot::MultiSeriesTracker::trackerTextF(const QPointF &pos) const {
 
                 if (index != -1) {
                     label += QString(" %1: %2 \n")
-                             .arg(curve->title().text(), -12)
-                             .arg(found_sample.y(), 8, 'f', 2);
+                                 .arg(curve->title().text(), -12)
+                                 .arg(found_sample.y(), 8, 'f', 2);
                 } else {
                     label += QString(" %1: -- \n").arg(curve->title().text(), -12);
                 }

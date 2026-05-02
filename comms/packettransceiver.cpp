@@ -1,4 +1,5 @@
 #include "packettransceiver.h"
+
 #include "packets.h"
 
 #include <chrono>
@@ -12,9 +13,10 @@ Communication::PacketTransceiver::PacketTransceiver(QIODevice *device, QObject *
     QObject::connect(m_device, &QIODevice::readyRead, this, &PacketTransceiver::read_data);
 }
 
-uint16_t Communication::PacketTransceiver::PacketTransceiver::calculate_checksum(const void *data, size_t length) {
+uint16_t Communication::PacketTransceiver::PacketTransceiver::calculate_checksum(const void *data,
+                                                                                 size_t length) {
     constexpr int footer_check_sum_length = 3;
-    const uint8_t* bytes = reinterpret_cast<const uint8_t*>(data);
+    const uint8_t *bytes = reinterpret_cast<const uint8_t *>(data);
     uint16_t checksum = 0;
 
     size_t target_length = length - footer_check_sum_length;
@@ -30,9 +32,11 @@ bool Communication::PacketTransceiver::validate_checksum(const QByteArray &packe
     constexpr int checksum_offset_from_end = 3;
     if (packet.size() > checksum_offset_from_end) {
         uint16_t sent_checksum;
-        uint16_t calculated = calculate_checksum(packet.data(), packet.size() - checksum_offset_from_end);
+        uint16_t calculated =
+            calculate_checksum(packet.data(), packet.size() - checksum_offset_from_end);
 
-        std::memcpy(&sent_checksum, packet.data() + packet.size() - checksum_offset_from_end, sizeof(uint16_t));
+        std::memcpy(&sent_checksum, packet.data() + packet.size() - checksum_offset_from_end,
+                    sizeof(uint16_t));
 
         return (sent_checksum == calculated);
     }
@@ -60,9 +64,9 @@ void Communication::PacketTransceiver::send_command(OPCode cmd) {
 
 void Communication::PacketTransceiver::process_buffer() {
     while (m_incoming_data.size() >= static_cast<int>(sizeof(PacketHeader))) {
-        const auto* header = reinterpret_cast<const PacketHeader*>(m_incoming_data.constData());
+        const auto *header = reinterpret_cast<const PacketHeader *>(m_incoming_data.constData());
 
-        //Make sure we found the header at the start of the frame and it is the expected byte
+        // Make sure we found the header at the start of the frame and it is the expected byte
         if (static_cast<uint8_t>(header->sof) != static_cast<uint8_t>(0xA5)) {
             m_incoming_data.remove(0, 1);
             continue;
@@ -70,26 +74,26 @@ void Communication::PacketTransceiver::process_buffer() {
 
         const uint8_t expected_size = header->packet_length;
 
-        //Make sure that the size is within the realm of possibility
+        // Make sure that the size is within the realm of possibility
         constexpr uint8_t absolute_min = sizeof(PacketHeader) + 1 + sizeof(PacketFooter);
         if (expected_size < absolute_min || expected_size > 255) {
             m_incoming_data.remove(0, 1);
             continue;
         }
 
-        //Entire packet hasn't arrived yet
+        // Entire packet hasn't arrived yet
         if (m_incoming_data.size() < expected_size) {
             return;
         }
 
-        //Make sure the footer is at the end of the frame and is the expected Byte
+        // Make sure the footer is at the end of the frame and is the expected Byte
         const uint8_t footer = static_cast<uint8_t>(m_incoming_data.at(expected_size - 1));
         if (footer != 0x5A) {
             m_incoming_data.remove(0, 1);
             continue;
         }
 
-        //Whole packet arrived, make sure checksum is good
+        // Whole packet arrived, make sure checksum is good
         QByteArray packet_raw = m_incoming_data.left(expected_size);
         if (validate_checksum(packet_raw)) {
 

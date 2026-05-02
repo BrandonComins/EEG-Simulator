@@ -10,7 +10,7 @@ namespace Plot {
  */
 class MultiSeriesTracker : public QwtPlotPicker {
   public:
-    MultiSeriesTracker(QWidget* canvas);
+    MultiSeriesTracker(QWidget *canvas);
 
   protected:
     /*!
@@ -23,6 +23,6 @@ class MultiSeriesTracker : public QwtPlotPicker {
      */
     virtual QwtText trackerTextF(const QPointF &pos) const override;
 };
-} //namespace Plot
+} // namespace Plot
 
-#endif //MULTI_SERIES_TRACKER_H
+#endif // MULTI_SERIES_TRACKER_H

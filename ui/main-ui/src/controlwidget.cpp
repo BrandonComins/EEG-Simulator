@@ -1,10 +1,10 @@
 #include "controlwidget.h"
+
 #include "ui_controlwidget.h"
 
 ControlWidget::ControlWidget(const std::string &channel_id, QWidget *parent)
     : QWidget(parent)
-    , ui(new Ui::ControlWidget)
-{
+    , ui(new Ui::ControlWidget) {
     ui->setupUi(this);
 
     ui->groupBox_channel->setTitle(QString::fromStdString(channel_id));
@@ -14,7 +14,7 @@ ControlWidget::~ControlWidget() {
     delete ui;
 }
 
-//Bad fix me later. Should be index
+// Bad fix me later. Should be index
 auto ControlWidget::channel_id() const -> int {
     auto id = ui->groupBox_channel->title();
     id.remove(QStringLiteral("Channel "));

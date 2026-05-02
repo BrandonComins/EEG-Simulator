@@ -15,8 +15,7 @@ struct EEGSample;
  * \brief A high-performance, this class generates EEG data
  */
 class EEG {
-public:
-
+  public:
     /*!
      * \brief Constructs the simulator.
      */
@@ -105,16 +104,16 @@ public:
 
     void initialize_from_settings();
 
-private:
-    int m_id;                    //!< Unique ID of the eeg.
-    std::mt19937 m_seed;         //!< Seed for random variation
-    double m_alpha_amplitude_uv; //!< Amplitude of the Alpha wave in uV.
-    double m_alpha_freq_hz;      //!< Frequency of the Alpha wave in Hz.
-    double m_beta_amplitude_uv;  //!< Amplitude of the Beta wave in uV.
-    double m_beta_freq_hz;       //!< Frequency of the Beta wave in Hz.
-    double m_noise_scale;        //!< Scaling factor for generated noise.
-    double m_noise_persistence;  //!< Coefficient for noise smoothing (0.0 to 1.0).
-    double m_last_noise;         //!< Internal state for the noise filter.
+  private:
+    int m_id;                              //!< Unique ID of the eeg.
+    std::mt19937 m_seed;                   //!< Seed for random variation
+    double m_alpha_amplitude_uv;           //!< Amplitude of the Alpha wave in uV.
+    double m_alpha_freq_hz;                //!< Frequency of the Alpha wave in Hz.
+    double m_beta_amplitude_uv;            //!< Amplitude of the Beta wave in uV.
+    double m_beta_freq_hz;                 //!< Frequency of the Beta wave in Hz.
+    double m_noise_scale;                  //!< Scaling factor for generated noise.
+    double m_noise_persistence;            //!< Coefficient for noise smoothing (0.0 to 1.0).
+    double m_last_noise;                   //!< Internal state for the noise filter.
     std::unique_ptr<QSettings> m_settings; //!< Settings file containing constants
 };
 

@@ -1,7 +1,8 @@
 #include "connectiondialog.h"
-#include "ui_connectiondialog.h"
 
 #include "plothelper.h"
+#include "ui_connectiondialog.h"
+
 #include <QSettings>
 #include <qtimer.h>
 
@@ -14,8 +15,7 @@ ConnectionDialog::ConnectionDialog(QWidget *parent)
     , m_bytes_received(0)
     , m_stats_timer(new QTimer(this))
     , m_settings(new QSettings(QStringLiteral("EEG"), QStringLiteral("Ui Connection"), this))
-    , ui(new Ui::ConnectionDialog)
-{
+    , ui(new Ui::ConnectionDialog) {
     ui->setupUi(this);
 
     m_plot = new Plot::PlotHelper(ui->frame, this);
@@ -31,8 +31,8 @@ ConnectionDialog::ConnectionDialog(QWidget *parent)
     int saved_port = m_settings->value("last_used_port", default_port).toInt();
     ui->spinBox_port->setValue(saved_port);
 
-    QObject::connect(ui->pushButton_connect, &QPushButton::clicked,
-                     this, &ConnectionDialog::toggle_server);
+    QObject::connect(ui->pushButton_connect, &QPushButton::clicked, this,
+                     &ConnectionDialog::toggle_server);
 
     QObject::connect(m_stats_timer, &QTimer::timeout, this, &ConnectionDialog::calculate_speed);
 }
@@ -50,7 +50,7 @@ void ConnectionDialog::user_disconnected() {
 }
 
 void ConnectionDialog::toggle_server() {
-    if(!m_server_on) {
+    if (!m_server_on) {
         constexpr int time_ms = 1000;
         m_server_on = true;
         ui->pushButton_connect->setText(QStringLiteral("Stop Server"));
@@ -80,21 +80,17 @@ void ConnectionDialog::calculate_speed() {
 
 void ConnectionDialog::ConnectionDialog::set_led_status(bool connected) {
     if (connected) {
-        ui->label_status_led->setStyleSheet(
-            "background-color: #2ecc71; "
-            "border-radius: 10px; "
-            "border: 2px solid #2ecc71; "
-            "min-width: 20px; "
-            "min-height: 20px;"
-            );
+        ui->label_status_led->setStyleSheet("background-color: #2ecc71; "
+                                            "border-radius: 10px; "
+                                            "border: 2px solid #2ecc71; "
+                                            "min-width: 20px; "
+                                            "min-height: 20px;");
     } else {
-        ui->label_status_led->setStyleSheet(
-            "background-color: #c0392b; "
-            "border-radius: 10px; "
-            "border: 2px solid #c0392b; "
-            "min-width: 20px; "
-            "min-height: 20px;"
-            );
+        ui->label_status_led->setStyleSheet("background-color: #c0392b; "
+                                            "border-radius: 10px; "
+                                            "border: 2px solid #c0392b; "
+                                            "min-width: 20px; "
+                                            "min-height: 20px;");
     }
 }
 

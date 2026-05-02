@@ -11,18 +11,17 @@ ControlTab::ControlTab(QWidget *parent)
     : QWidget(parent)
     , m_poll_timer(new QTimer(this))
     , m_packet_transceiver(nullptr)
-    , ui(new Ui::ControlTab)
-{
+    , ui(new Ui::ControlTab) {
     ui->setupUi(this);
 
     constexpr int poll_time_ms = 20;
     m_poll_timer->setInterval(poll_time_ms);
 
-    QObject::connect(m_poll_timer, &QTimer::timeout, this,
-                     &ControlTab::request_latest_data, Qt::UniqueConnection);
+    QObject::connect(m_poll_timer, &QTimer::timeout, this, &ControlTab::request_latest_data,
+                     Qt::UniqueConnection);
 
-    QObject::connect(ui->pushButton_sync, &QPushButton::clicked,
-                     this, qOverload<>(&ControlTab::request_channel_constants));
+    QObject::connect(ui->pushButton_sync, &QPushButton::clicked, this,
+                     qOverload<>(&ControlTab::request_channel_constants));
 
     QObject::connect(ui->pushButton_send, &QPushButton::clicked, this,
                      &ControlTab::send_channel_constants);
@@ -74,7 +73,6 @@ void ControlTab::update_channel_constants(const Communication::ChannelConstants 
     }
 }
 
-
 void ControlTab::on_connection() {
     request_num_channels();
     m_poll_timer->start();
@@ -85,8 +83,8 @@ void ControlTab::on_disconnect() {
 }
 
 void ControlTab::send_channel_constants() {
-    if(m_packet_transceiver) {
-        for(auto const &channel : std::as_const(m_control_widgets)) {
+    if (m_packet_transceiver) {
+        for (auto const &channel : std::as_const(m_control_widgets)) {
             Communication::ChannelConstants pkt;
             pkt.channel_id = channel->channel_id();
             pkt.alpha_amplitude = channel->alpha_amplitude_uv();
@@ -103,7 +101,7 @@ void ControlTab::send_channel_constants() {
 
 void ControlTab::request_channel_constants() {
     if (m_packet_transceiver) {
-        for(auto const &channel : std::as_const(m_control_widgets)) {
+        for (auto const &channel : std::as_const(m_control_widgets)) {
             request_channel_constants(channel->channel_id());
         }
     }
@@ -114,4 +112,3 @@ void ControlTab::request_channel_constants(int channel_id) {
     pkt.channel_id = channel_id;
     m_packet_transceiver->send_command(Communication::CMD_GET_CHANNEL_CONSTANTS, pkt);
 }
-

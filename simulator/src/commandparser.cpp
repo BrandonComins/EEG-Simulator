@@ -1,4 +1,5 @@
 #include "commandparser.h"
+
 #include "eeg.h"
 #include "fmt/base.h"
 #include "fmt/ranges.h"
@@ -8,17 +9,16 @@
 
 namespace Communication {
 
-CommandParser::CommandParser(const std::vector<EEG*> &channels, PacketTransceiver *transceiver)
+CommandParser::CommandParser(const std::vector<EEG *> &channels, PacketTransceiver *transceiver)
     : m_log_buffer(channels.size())
     , m_transceiver(transceiver)
     , m_channels(channels) {
     /* empty */
 }
 
-
 void CommandParser::process_raw_packet(const QByteArray &data) {
     if (data.size() >= static_cast<int>(sizeof(PacketHeader) + sizeof(OPCode))) {
-        const auto *header = reinterpret_cast<const PacketHeader*>(data.constData());
+        const auto *header = reinterpret_cast<const PacketHeader *>(data.constData());
         const auto cmd = static_cast<OPCode>(data.at(sizeof(PacketHeader)));
         const char *payload_ptr = data.constData() + sizeof(PacketHeader) + sizeof(OPCode);
 
@@ -26,13 +26,13 @@ void CommandParser::process_raw_packet(const QByteArray &data) {
     }
 }
 
-bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, const char* payload) {
+bool CommandParser::execute_command(OPCode cmd, const PacketHeader &header, const char *payload) {
     const uint8_t req_id = header.request_id;
 
     switch (cmd) {
 
     case CMD_SET_CHANNEL_CONSTANTS: {
-        const auto* pkt = reinterpret_cast<const ChannelConstants*>(payload);
+        const auto *pkt = reinterpret_cast<const ChannelConstants *>(payload);
         auto &channel = m_channels.at(pkt->channel_id);
 
         channel->set_alpha_amplitude(pkt->alpha_amplitude);
@@ -46,7 +46,7 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
     }
 
     case CMD_GET_CHANNEL_CONSTANTS: {
-        const auto* pkt = reinterpret_cast<const RequestChannelConstants*>(payload);
+        const auto *pkt = reinterpret_cast<const RequestChannelConstants *>(payload);
         auto &channel = m_channels.at(pkt->channel_id);
 
         ChannelConstants reply;
@@ -73,7 +73,7 @@ bool CommandParser::execute_command(OPCode cmd, const PacketHeader& header, cons
     }
 
     case CMD_GET_LATEST_DATA: {
-        const auto* req = reinterpret_cast<const RequestSample*>(payload);
+        const auto *req = reinterpret_cast<const RequestSample *>(payload);
         uint8_t channel = req->channel_id;
 
         if (channel >= m_channels.size()) {

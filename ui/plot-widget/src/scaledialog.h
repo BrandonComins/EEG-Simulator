@@ -9,11 +9,10 @@ class ScaleDialog;
 
 namespace Plot {
 
-class ScaleDialog : public QDialog
-{
+class ScaleDialog : public QDialog {
     Q_OBJECT
 
-public:
+  public:
     /*!
      * \brief Constructs a new ScaleDialog object.
      * \param parent The parent widget.
@@ -30,7 +29,7 @@ public:
      */
     void handle_scale_button();
 
-Q_SIGNALS:
+  Q_SIGNALS:
     /*!
      * \brief Signal emitted when the user confirms manual scale values.
      * \param min_x The minimum value for the horizontal axis.
@@ -45,9 +44,9 @@ Q_SIGNALS:
      */
     void auto_scale_clicked();
 
-private:
+  private:
     Ui::ScaleDialog *ui; //!< Pointer to the UI object
 };
-} //namespace Plot
+} // namespace Plot
 
 #endif // SCALEDIALOG_H

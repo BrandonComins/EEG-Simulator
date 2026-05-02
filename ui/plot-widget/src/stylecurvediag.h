@@ -1,9 +1,10 @@
 #ifndef STYLECURVEDIAG_H
 #define STYLECURVEDIAG_H
 
+#include "plotdefs.h"
+
 #include <QDialog>
 #include <string>
-#include "plotdefs.h"
 
 namespace Ui {
 class StyleCurveDiag;
@@ -18,19 +19,17 @@ namespace Plot {
  * and symbol types for a specific curve. It operates on a reference to a
  * live configuration object, providing real-time feedback through signals.
  */
-class StyleCurveDiag : public QDialog
-{
+class StyleCurveDiag : public QDialog {
     Q_OBJECT
 
-public:
+  public:
     /*!
      * \brief Constructor
      * \param id The ID of the series.
      * \param live_config Reference to the current configuration being applied to the series.
      * \param parent Optional parent widget.
      */
-    explicit StyleCurveDiag(const std::string &id,
-                            Plot::CurveConfig &live_config,
+    explicit StyleCurveDiag(const std::string &id, Plot::CurveConfig &live_config,
                             QWidget *parent = nullptr);
 
     /*!
@@ -38,14 +37,14 @@ public:
      */
     ~StyleCurveDiag();
 
-Q_SIGNALS:
+  Q_SIGNALS:
     /*!
      * \brief Signal emitted when any visual setting is modified in the UI.
      * \param id ID of the series.
      */
     void settings_changed(const std::string &id);
 
-private:
+  private:
     /*!
      * \brief Updates the series' config and emits settings_changed.
      */

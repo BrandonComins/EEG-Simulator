@@ -7,18 +7,22 @@
 
 PacketParser::PacketParser(QObject *parent)
     : QObject(parent)
-    , m_num_channels(0){
+    , m_num_channels(0) {
 
     /*empty*/
 }
 
 void PacketParser::process_incoming_packet(const QByteArray &data) {
-    if (data.size() >= static_cast<int>(sizeof(Communication::PacketHeader) + sizeof(Communication::OPCode))) {
-        const auto* header = reinterpret_cast<const Communication::PacketHeader*>(data.constData());
+    if (data.size() >=
+        static_cast<int>(sizeof(Communication::PacketHeader) + sizeof(Communication::OPCode))) {
+        const auto *header =
+            reinterpret_cast<const Communication::PacketHeader *>(data.constData());
 
         if (header->type == Communication::PACKET_TYPE_REPLY) {
-            auto cmd = static_cast<Communication::OPCode>(data.at(sizeof(Communication::PacketHeader)));
-            const char* payload = data.constData() + sizeof(Communication::PacketHeader) + sizeof(Communication::OPCode);
+            auto cmd =
+                static_cast<Communication::OPCode>(data.at(sizeof(Communication::PacketHeader)));
+            const char *payload = data.constData() + sizeof(Communication::PacketHeader) +
+                                  sizeof(Communication::OPCode);
 
             switch (cmd) {
             case Communication::CMD_GET_LATEST_DATA:
@@ -46,7 +50,7 @@ std::string get_channel_name(int channel_id) {
 }
 
 void PacketParser::handle_eeg_data(const Communication::PacketHeader *header, const char *payload) {
-    const auto* sample = reinterpret_cast<const Communication::EEGSample*>(payload);
+    const auto *sample = reinterpret_cast<const Communication::EEGSample *>(payload);
 
     const auto x = static_cast<double>(header->timestamp_ms) / 1000.0;
     const auto y = static_cast<double>(sample->value);
@@ -55,12 +59,12 @@ void PacketParser::handle_eeg_data(const Communication::PacketHeader *header, co
 }
 
 void PacketParser::handle_channel_count(const char *payload) {
-    const auto* reply = reinterpret_cast<const Communication::ChannelsCount*>(payload);
+    const auto *reply = reinterpret_cast<const Communication::ChannelsCount *>(payload);
 
     m_num_channels = static_cast<int>(reply->num_channels);
     fmt::println("UI synced: Hardware reporting {} channels.", m_num_channels);
 
-    for(int channel = 0; channel < m_num_channels; ++channel) {
+    for (int channel = 0; channel < m_num_channels; ++channel) {
         constexpr int y_offset = 100;
         Plot::CurveConfig config;
         config.y_offset = channel * y_offset;

@@ -3,6 +3,7 @@
 
 #include "multiseriestracker.h"
 #include "plotdefs.h"
+
 #include <QObject>
 #include <QVector>
 #include <string>
@@ -33,7 +34,7 @@ class PlotHelper : public QObject {
      * \param frame The QFrame that will contain the QwtPlot.
      * \param parent Optional QObject.
      */
-    explicit PlotHelper(QFrame *frame, QObject* parent = nullptr);
+    explicit PlotHelper(QFrame *frame, QObject *parent = nullptr);
 
     /*!
      * \brief Cleans up plot resources and dialogs.
@@ -141,13 +142,13 @@ class PlotHelper : public QObject {
     /*!
      * \brief Displays the custom plot context menu at the specified position.
      */
-    void show_context_menu(const QPoint& pos);
+    void show_context_menu(const QPoint &pos);
 
   protected:
     /*!
      * \brief Provides access to the underlying QwtPlot widget.
      */
-    [[nodiscard]] auto plot() const -> QwtPlot*;
+    [[nodiscard]] auto plot() const -> QwtPlot *;
 
   private:
     /*!
@@ -197,23 +198,23 @@ class PlotHelper : public QObject {
      */
     void export_image(const QString &path);
 
-    bool m_paused;                      //!< Flag for if the plot is paused
-    bool m_auto_scale_x;                //!< Flag for X-axis auto-scaling.
-    bool m_auto_scale_y;                //!< Flag for Y-axis auto-scaling.
-    QString m_x_axis_title;             //!< Title of the X-axis
-    QString m_y_axis_title;             //!< Title of the Y-axis
-    PlotMode m_view_mode;               //!< Current horizontal viewing behavior.
-    ScaleDialog *m_scale_diag;          //!< Dialog for manual scale input.
-    QwtPlot *m_plot;                    //!< The core QwtPlot widget.
-    QwtPlotLegendItem *m_legend;        //!< The legend of the plot.
-    QwtPlotGrid *m_grid;                //!< Visual background grid.
-    QwtPlotZoomer *m_zoomer;            //!< Zooming interaction handler.
-    QwtPlotMagnifier *m_magnifier;      //!< Mouse-wheel magnification handler.
-    MultiSeriesTracker *m_picker;       //!< Displays the point at a picked position
-    PeakManager *m_peak_manager;        //!< Manages local peaks
+    bool m_paused;                           //!< Flag for if the plot is paused
+    bool m_auto_scale_x;                     //!< Flag for X-axis auto-scaling.
+    bool m_auto_scale_y;                     //!< Flag for Y-axis auto-scaling.
+    QString m_x_axis_title;                  //!< Title of the X-axis
+    QString m_y_axis_title;                  //!< Title of the Y-axis
+    PlotMode m_view_mode;                    //!< Current horizontal viewing behavior.
+    ScaleDialog *m_scale_diag;               //!< Dialog for manual scale input.
+    QwtPlot *m_plot;                         //!< The core QwtPlot widget.
+    QwtPlotLegendItem *m_legend;             //!< The legend of the plot.
+    QwtPlotGrid *m_grid;                     //!< Visual background grid.
+    QwtPlotZoomer *m_zoomer;                 //!< Zooming interaction handler.
+    QwtPlotMagnifier *m_magnifier;           //!< Mouse-wheel magnification handler.
+    MultiSeriesTracker *m_picker;            //!< Displays the point at a picked position
+    PeakManager *m_peak_manager;             //!< Manages local peaks
     std::vector<std::string> m_series_order; //!< The order of insertion for the series
-    std::map<std::string, Series> m_series; //!< Map of IDs to data series.
-    std::map<std::string, StyleCurveDiag*> m_style_dialogs; //!< Map of IDs to data series dialogs.
+    std::map<std::string, Series> m_series;  //!< Map of IDs to data series.
+    std::map<std::string, StyleCurveDiag *> m_style_dialogs; //!< Map of IDs to data series dialogs.
 };
 
 } // namespace Plot

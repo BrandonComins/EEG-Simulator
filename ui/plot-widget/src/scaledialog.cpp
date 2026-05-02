@@ -1,4 +1,5 @@
 #include "scaledialog.h"
+
 #include "ui_scaledialog.h"
 
 Plot::ScaleDialog::ScaleDialog(QWidget *parent)
@@ -9,11 +10,11 @@ Plot::ScaleDialog::ScaleDialog(QWidget *parent)
 
     this->setWindowTitle(QStringLiteral("Scale The Plot"));
 
-    QObject::connect(ui->pushButton_auto_scale, &QPushButton::clicked,
-                     this, &ScaleDialog::auto_scale_clicked, Qt::UniqueConnection);
+    QObject::connect(ui->pushButton_auto_scale, &QPushButton::clicked, this,
+                     &ScaleDialog::auto_scale_clicked, Qt::UniqueConnection);
 
-    QObject::connect(ui->pushButton_scale, &QPushButton::clicked,
-                     this, &ScaleDialog::handle_scale_button, Qt::UniqueConnection);
+    QObject::connect(ui->pushButton_scale, &QPushButton::clicked, this,
+                     &ScaleDialog::handle_scale_button, Qt::UniqueConnection);
 }
 
 Plot::ScaleDialog::~ScaleDialog() {

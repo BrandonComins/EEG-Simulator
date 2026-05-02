@@ -10,7 +10,7 @@ class ControlWidget;
 class ControlWidget : public QWidget {
     Q_OBJECT
 
-public:
+  public:
     explicit ControlWidget(const std::string &channel_id, QWidget *parent = nullptr);
     ~ControlWidget();
 
@@ -92,8 +92,7 @@ public:
      */
     [[nodiscard]] auto noise_persistence() const -> double;
 
-
-private:
+  private:
     Ui::ControlWidget *ui;
 };
 

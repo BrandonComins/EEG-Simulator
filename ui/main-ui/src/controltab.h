@@ -13,13 +13,12 @@ class FlowLayout;
 namespace Communication {
 class PacketTransceiver;
 struct ChannelConstants;
-}
+} // namespace Communication
 
-class ControlTab : public QWidget
-{
+class ControlTab : public QWidget {
     Q_OBJECT
 
-public:
+  public:
     explicit ControlTab(QWidget *parent = nullptr);
     ~ControlTab();
 
@@ -47,9 +46,9 @@ public:
     /*!
      * \brief on_disconnect This function is run when a device is disconnected
      */
-    void on_disconnect();    
+    void on_disconnect();
 
-private:
+  private:
     /*!
      * \brief send_channel_constants Update the channel constants from the device
      */
@@ -75,10 +74,10 @@ private:
      */
     void request_num_channels();
 
-    QTimer *m_poll_timer; //!< Timer to request new samples
-    std::vector<ControlWidget*> m_control_widgets; //!< List of control widgets
+    QTimer *m_poll_timer;                                   //!< Timer to request new samples
+    std::vector<ControlWidget *> m_control_widgets;         //!< List of control widgets
     Communication::PacketTransceiver *m_packet_transceiver; //!< Pointer to the packer transceiver
-    Ui::ControlTab *ui; //!< Qt Ui
+    Ui::ControlTab *ui;                                     //!< Qt Ui
 };
 
 #endif // CONTROLTAB_H

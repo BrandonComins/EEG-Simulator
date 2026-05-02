@@ -1,8 +1,6 @@
-#include <QObject>
-
+#include <QColor>
 #include <QObject>
 #include <QPointF>
-#include <QColor>
 
 class QwtPlot;
 class QwtPlotMarker;
@@ -20,7 +18,7 @@ class PeakManager : public QObject {
      * \brief Constructs a PeakManager for a specific plot.
      * \param plot Pointer to the QwtPlot to monitor and mark.
      */
-    explicit PeakManager(QwtPlot* plot);
+    explicit PeakManager(QwtPlot *plot);
 
     /*!
      *  \brief Enables or disables the visualization of local maxima.
@@ -66,12 +64,13 @@ class PeakManager : public QObject {
      * \param color The base color (usually matching the curve).
      * \param is_peak True for an upward triangle (max), false for downward (min).
      */
-    void add_peak_marker(const QPointF& point, const QColor& color, bool is_peak);
+    void add_peak_marker(const QPointF &point, const QColor &color, bool is_peak);
 
-    QwtPlot* m_plot;                //!< The target plot widget.
-    bool m_show_peaks;              //!< Toggle state for maxima.
-    bool m_show_mins;               //!< Toggle state for minima.
-    std::vector<QwtPlotMarker*> m_active_markers; //!< List of markers currently owned by this manager.
+    QwtPlot *m_plot;   //!< The target plot widget.
+    bool m_show_peaks; //!< Toggle state for maxima.
+    bool m_show_mins;  //!< Toggle state for minima.
+    std::vector<QwtPlotMarker *>
+        m_active_markers; //!< List of markers currently owned by this manager.
 };
 
-}
+} // namespace Plot

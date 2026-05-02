@@ -17,8 +17,7 @@ class PlotHelper;
  * \class ConnectionDialog
  * \brief UI component responsible for managing the TCP Server lifecycle and status.
  */
-class ConnectionDialog : public QDialog
-{
+class ConnectionDialog : public QDialog {
     Q_OBJECT
 
   public:
@@ -78,13 +77,13 @@ class ConnectionDialog : public QDialog
      */
     void set_led_status(bool connected);
 
-    bool m_server_on;            //!< Tracks whether the server listener is active.
+    bool m_server_on; //!< Tracks whether the server listener is active.
     double m_last_x_axis_point;
     int m_bytes_received;
     QTimer *m_stats_timer;
-    Plot::PlotHelper *m_plot;    //!< Connection plot
-    QSettings *m_settings;       //!< Settings to remember the port
-    Ui::ConnectionDialog *ui;    //!< Pointer to the Ui.
+    Plot::PlotHelper *m_plot; //!< Connection plot
+    QSettings *m_settings;    //!< Settings to remember the port
+    Ui::ConnectionDialog *ui; //!< Pointer to the Ui.
 };
 
 #endif // CONNECTIONDIALOG_H

@@ -2,6 +2,7 @@
 #define PACKETPARSER_H
 
 #include "packets.h"
+
 #include <QObject>
 
 class QTcpSocket;
@@ -9,19 +10,18 @@ class QTcpSocket;
 namespace Plot {
 class PlotHelper;
 class CurveConfig;
-}
+} // namespace Plot
 
-class PacketParser : public QObject
-{
+class PacketParser : public QObject {
     Q_OBJECT
   public:
     explicit PacketParser(QObject *parent = nullptr);
 
-      /*!
-    * \brief Unpacks and routes incoming binary data.
-    * \param data The raw, validated binary packet from the transceiver.
-    */
-      void process_incoming_packet(const QByteArray &data);
+    /*!
+     * \brief Unpacks and routes incoming binary data.
+     * \param data The raw, validated binary packet from the transceiver.
+     */
+    void process_incoming_packet(const QByteArray &data);
 
   Q_SIGNALS:
     /*!
@@ -51,21 +51,21 @@ class PacketParser : public QObject
      * \param header Pointer to the packet header (for timestamp).
      * \param payload Pointer to the raw EEGSample payload.
      */
-    void handle_eeg_data(const Communication::PacketHeader* header, const char* payload);
+    void handle_eeg_data(const Communication::PacketHeader *header, const char *payload);
 
     /*!
      * \brief Handles the response containing the hardware's channel configuration.
      * \param payload Pointer to the raw ChannelsCount payload.
      */
-    void handle_channel_count(const char* payload);
+    void handle_channel_count(const char *payload);
 
     /*!
      * \brief Handles the response containing a channel's constants.
      * \param payload Pointer to the raw ChannelConstants payload.
      */
-    void handle_channel_constants(const char* payload);
+    void handle_channel_constants(const char *payload);
 
-    int m_num_channels;  //!< The number of channels in the connected device
+    int m_num_channels; //!< The number of channels in the connected device
 };
 
 #endif // PACKETPARSER_H

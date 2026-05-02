@@ -25,8 +25,7 @@ class MainWindow;
  * \class MainWindow
  * \brief The central widget of the UI.
  */
-class MainWindow : public QMainWindow
-{
+class MainWindow : public QMainWindow {
     Q_OBJECT
 
   public:
@@ -39,13 +38,13 @@ class MainWindow : public QMainWindow
      */
     void handle_new_connection();
 
-    Plot::PlotHelper *m_plot;              //!< Plot for the EEG samples
-    QTcpServer *m_server;                  //!< The TCP server
-    QTcpSocket* m_current_client;          //!< The currently connected client
+    Plot::PlotHelper *m_plot;                               //!< Plot for the EEG samples
+    QTcpServer *m_server;                                   //!< The TCP server
+    QTcpSocket *m_current_client;                           //!< The currently connected client
     Communication::PacketTransceiver *m_packet_transceiver; //!< The packet handler
-    PacketParser *m_packet_parser;         //!< Pointer to the packet parser 
-    ConnectionDialog *m_connection_dialog; //!< The connection dialog
-    Ui::MainWindow *ui;                    //!< Qt UI Object
+    PacketParser *m_packet_parser;                          //!< Pointer to the packet parser
+    ConnectionDialog *m_connection_dialog;                  //!< The connection dialog
+    Ui::MainWindow *ui;                                     //!< Qt UI Object
 };
 
 #endif // MAINWINDOW_H

@@ -7,15 +7,15 @@
  */
 #include "packets.h"
 
-#include <QObject>
 #include <QIODevice>
+#include <QObject>
 
 class QIODevice;
 
 namespace Communication {
 
-constexpr uint8_t  SOF_MARKER = 0xA5; //Packet Start of Frame
-constexpr uint8_t  EOF_MARKER = 0x5A; // Packet End of Frame
+constexpr uint8_t SOF_MARKER = 0xA5; // Packet Start of Frame
+constexpr uint8_t EOF_MARKER = 0x5A; // Packet End of Frame
 
 /*!
  * \class PacketTransceiver
@@ -30,19 +30,19 @@ class PacketTransceiver : public QObject {
      * \param device A QIO device (QTcpSocket, QSerialport, etc)
      * \param parent QObject parent
      */
-    explicit PacketTransceiver(QIODevice* device, QObject* parent = nullptr);
+    explicit PacketTransceiver(QIODevice *device, QObject *parent = nullptr);
 
     /*!
      * \brief Calculates a checksum for the given data buffer.
      */
-    uint16_t calculate_checksum(const void* data, size_t length);
+    uint16_t calculate_checksum(const void *data, size_t length);
 
     /*!
      * \brief Validates a packet's checksum
      * \param packet The raw bytes of the packet to validate.
      * \return True if the packet is valid, false otherwise.
      */
-    bool validate_checksum(const QByteArray& packet);
+    bool validate_checksum(const QByteArray &packet);
 
     /*!
      * \brief Retrieves the current epoch time.
@@ -60,8 +60,7 @@ class PacketTransceiver : public QObject {
      * \param cmd A command with a payload
      * \param payload The data of the packet
      */
-    template <typename T>
-    void send_command(OPCode cmd, const T& payload) {
+    template <typename T> void send_command(OPCode cmd, const T &payload) {
         transmit(cmd, ++m_global_packet_count, PACKET_TYPE_REQUEST, payload);
     }
 
@@ -71,8 +70,7 @@ class PacketTransceiver : public QObject {
      * \param original_req_id The id of the command
      * \param payload The data of the packet
      */
-    template <typename T>
-    void send_reply(OPCode cmd, uint8_t original_req_id, const T& payload) {
+    template <typename T> void send_reply(OPCode cmd, uint8_t original_req_id, const T &payload) {
         transmit(cmd, original_req_id, PACKET_TYPE_REPLY, payload);
     }
 
@@ -92,8 +90,9 @@ class PacketTransceiver : public QObject {
      * \param payload The data of the packet
      */
     template <typename T>
-    void transmit(OPCode cmd, uint8_t req_id, PacketType type, const T& payload) {
-        const uint8_t total_size = sizeof(PacketHeader) + sizeof(OPCode) + sizeof(T) + sizeof(PacketFooter);
+    void transmit(OPCode cmd, uint8_t req_id, PacketType type, const T &payload) {
+        const uint8_t total_size =
+            sizeof(PacketHeader) + sizeof(OPCode) + sizeof(T) + sizeof(PacketFooter);
 
         QByteArray buffer;
         buffer.reserve(total_size);
@@ -105,17 +104,17 @@ class PacketTransceiver : public QObject {
         header.request_id = req_id;
         header.timestamp_ms = get_timestamp();
         header.packet_id = ++m_global_packet_count;
-        buffer.append(reinterpret_cast<const char*>(&header), sizeof(PacketHeader));
+        buffer.append(reinterpret_cast<const char *>(&header), sizeof(PacketHeader));
 
         uint8_t op = static_cast<uint8_t>(cmd);
-        buffer.append(reinterpret_cast<const char*>(&op), 1);
+        buffer.append(reinterpret_cast<const char *>(&op), 1);
 
-        buffer.append(reinterpret_cast<const char*>(&payload), sizeof(T));
+        buffer.append(reinterpret_cast<const char *>(&payload), sizeof(T));
 
         PacketFooter footer;
         footer.checksum = calculate_checksum(buffer.constData(), buffer.size());
         footer.footer = EOF_MARKER;
-        buffer.append(reinterpret_cast<const char*>(&footer), sizeof(PacketFooter));
+        buffer.append(reinterpret_cast<const char *>(&footer), sizeof(PacketFooter));
 
         m_device->write(buffer);
     }
@@ -132,9 +131,9 @@ class PacketTransceiver : public QObject {
 
     uint32_t m_global_packet_count; //!< Number of packets that have been sent.
     uint8_t m_last_request_id;      //!< The ID of the last received request.
-    QIODevice* m_device;            //!< The active I/O device.
+    QIODevice *m_device;            //!< The active I/O device.
     QByteArray m_incoming_data;     //!< Buffer for incoming byte .
 };
-} //namespace Communication
+} // namespace Communication
 
-#endif //PACKET_TRANSCEIVER_H
+#endif // PACKET_TRANSCEIVER_H

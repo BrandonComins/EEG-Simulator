@@ -6,25 +6,25 @@
 #include "spdlog/async.h"
 #include "spdlog/sinks/basic_file_sink.h"
 
-#include <spdlog/spdlog.h>
-#include <QSettings>
 #include <QCoreApplication>
-#include <QTcpSocket>
-#include <QTimer>
-#include <QStandardPaths>
 #include <QDir>
 #include <QLockFile>
+#include <QSettings>
+#include <QStandardPaths>
+#include <QTcpSocket>
+#include <QTimer>
+#include <spdlog/spdlog.h>
 
 void synchronize_master_settings() {
     const QString settings_path = SettingsDefs::get_common_settings_path();
     QSettings settings(settings_path, QSettings::IniFormat);
 
     const QMap<QString, QVariant> defaults = {
-        {SettingsDefs::CommonKeys::num_channels,     SettingsDefs::CommonDefaults::num_channels},
-        {SettingsDefs::CommonKeys::server_port,      SettingsDefs::CommonDefaults::server_port},
-        {SettingsDefs::CommonKeys::server_ip,        SettingsDefs::CommonDefaults::server_ip},
-        {SettingsDefs::CommonKeys::connection_retry, SettingsDefs::CommonDefaults::connection_retry}
-    };
+        {SettingsDefs::CommonKeys::num_channels, SettingsDefs::CommonDefaults::num_channels},
+        {SettingsDefs::CommonKeys::server_port, SettingsDefs::CommonDefaults::server_port},
+        {SettingsDefs::CommonKeys::server_ip, SettingsDefs::CommonDefaults::server_ip},
+        {SettingsDefs::CommonKeys::connection_retry,
+         SettingsDefs::CommonDefaults::connection_retry}};
 
     bool needs_sync = false;
     for (auto it = defaults.begin(); it != defaults.end(); ++it) {
@@ -53,19 +53,16 @@ void init_logging(int num_channels) {
 
     const bool clear_on_start = true;
     auto log_path = (log_dir + "/channels.log").toStdString();
-    auto async_file = spdlog::basic_logger_mt<spdlog::async_factory>(
-        "channel_logger",
-        log_path,
-        clear_on_start
-        );
+    auto async_file =
+        spdlog::basic_logger_mt<spdlog::async_factory>("channel_logger", log_path, clear_on_start);
 
     spdlog::set_default_logger(async_file);
 
     spdlog::set_pattern("%v");
 
     std::string keys = "Time";
-    for(int id = 0; id < num_channels; ++id) {
-        keys+=fmt::format(", CH_{}", id);
+    for (int id = 0; id < num_channels; ++id) {
+        keys += fmt::format(", CH_{}", id);
     }
 
     constexpr int time_seconds = 3;
@@ -81,7 +78,7 @@ int main(int argc, char *argv[]) {
     QLockFile lock_file(lock_path);
 
     constexpr int time_ms = 100;
-    if(!lock_file.tryLock(time_ms)) {
+    if (!lock_file.tryLock(time_ms)) {
         fmt::println("CRITICAL: Another instance of the EEG Simulator is already running.");
         app.exit(1);
         exit(1);
@@ -90,13 +87,14 @@ int main(int argc, char *argv[]) {
     synchronize_master_settings();
 
     QSettings common_settings(SettingsDefs::get_common_settings_path(), QSettings::IniFormat);
-    const int num_channels       = common_settings.value(SettingsDefs::CommonKeys::num_channels).toInt();
-    const int port               = common_settings.value(SettingsDefs::CommonKeys::server_port).toInt();
-    const QString host_ip        = common_settings.value(SettingsDefs::CommonKeys::server_ip).toString();
-    const int connect_time_ms    = common_settings.value(SettingsDefs::CommonKeys::connection_retry).toInt();
+    const int num_channels = common_settings.value(SettingsDefs::CommonKeys::num_channels).toInt();
+    const int port = common_settings.value(SettingsDefs::CommonKeys::server_port).toInt();
+    const QString host_ip = common_settings.value(SettingsDefs::CommonKeys::server_ip).toString();
+    const int connect_time_ms =
+        common_settings.value(SettingsDefs::CommonKeys::connection_retry).toInt();
 
     std::vector<std::unique_ptr<EEG>> channels;
-    std::vector<EEG*> channel_observers;
+    std::vector<EEG *> channel_observers;
 
     channels.reserve(num_channels);
     channel_observers.reserve(num_channels);
@@ -119,8 +117,8 @@ int main(int argc, char *argv[]) {
 
     init_logging(num_channels);
 
-    QObject::connect(&transceiver, &Communication::PacketTransceiver::packet_received,
-                     &parser, &Communication::CommandParser::process_raw_packet);
+    QObject::connect(&transceiver, &Communication::PacketTransceiver::packet_received, &parser,
+                     &Communication::CommandParser::process_raw_packet);
 
     QObject::connect(&socket, &QTcpSocket::disconnected, [&]() {
         fmt::println("Disconnected! Retrying...");

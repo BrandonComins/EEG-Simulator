@@ -49,12 +49,12 @@ const std::vector<QColor> default_palette = {
  * \brief Configuration settings for a specific plot curve.
  */
 struct CurveConfig {
-    bool use_antialiasing = true;               //!< Toggle anti-aliased rendering.
-    float line_width = 1.5f;                    //!< Thickness of the curve line.
-    double z_order = 0.0;                       //!< Rendering priority (higher is on top).
-    double y_offset = 0.0;                      //!< Offset from the actual Y value
-    QColor color = Qt::transparent;             //!< Curve color.
-    Qt::PenStyle line_style = Qt::SolidLine;    //!< Style of the line (Solid, Dashed, etc).
+    bool use_antialiasing = true;            //!< Toggle anti-aliased rendering.
+    float line_width = 1.5f;                 //!< Thickness of the curve line.
+    double z_order = 0.0;                    //!< Rendering priority (higher is on top).
+    double y_offset = 0.0;                   //!< Offset from the actual Y value
+    QColor color = Qt::transparent;          //!< Curve color.
+    Qt::PenStyle line_style = Qt::SolidLine; //!< Style of the line (Solid, Dashed, etc).
     QwtPlotCurve::CurveStyle curve_style = QwtPlotCurve::Lines; //!< Qwt curve drawing style.
     QwtSymbol::Style symbol_type = QwtSymbol::NoSymbol;         //!< Type of point symbols.
 };
@@ -63,10 +63,10 @@ struct CurveConfig {
  * \brief Container for curve data and its associated configuration.
  */
 struct Series {
-    QwtPlotCurve* curve = nullptr;  //!< Pointer to the Qwt curve object.
-    CurveConfig config;             //!< Style and rendering configuration.
-    std::vector<double> x_data;     //!< Buffer for X-axis coordinates.
-    std::vector<double> y_data;     //!< Buffer for Y-axis coordinates.
+    QwtPlotCurve *curve = nullptr; //!< Pointer to the Qwt curve object.
+    CurveConfig config;            //!< Style and rendering configuration.
+    std::vector<double> x_data;    //!< Buffer for X-axis coordinates.
+    std::vector<double> y_data;    //!< Buffer for Y-axis coordinates.
 };
 
 /*!
@@ -85,7 +85,6 @@ enum PlotMode {
     ROLLING,    //!< Maintains a fixed window width, shifting with new data.
     SWEEP,      //!< Clears/re-draws from left to right in discrete pages.
 };
-} //namespace Plot
+} // namespace Plot
 
-
-#endif //PLOT_DEFS_H
+#endif // PLOT_DEFS_H

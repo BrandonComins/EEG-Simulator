@@ -1,10 +1,11 @@
 #include "mainwindow.h"
+
 #include "connectiondialog.h"
 #include "fmt/base.h"
 #include "packetparser.h"
+#include "packettransceiver.h"
 #include "plothelper.h"
 #include "ui_mainwindow.h"
-#include "packettransceiver.h"
 
 #include <QTcpServer>
 #include <QTcpSocket>
@@ -18,8 +19,7 @@ MainWindow::MainWindow(QWidget *parent)
     , m_packet_transceiver(nullptr)
     , m_packet_parser(new PacketParser(this))
     , m_connection_dialog(new ConnectionDialog(this))
-    , ui(new Ui::MainWindow)
-{
+    , ui(new Ui::MainWindow) {
     ui->setupUi(this);
 
     m_plot = new Plot::PlotHelper(ui->frame, this);
@@ -30,43 +30,42 @@ MainWindow::MainWindow(QWidget *parent)
     ui->action_connect->setShortcut(QKeySequence("Ctrl+C"));
     ui->action_quick_start->setShortcut(QKeySequence("Ctrl+Shift+C"));
 
-    QObject::connect(ui->action_quick_start, &QAction::triggered,
-                     m_connection_dialog, &ConnectionDialog::toggle_server) ;
+    QObject::connect(ui->action_quick_start, &QAction::triggered, m_connection_dialog,
+                     &ConnectionDialog::toggle_server);
 
-    QObject::connect(ui->action_connect, &QAction::triggered,
-            m_connection_dialog, &ConnectionDialog::show, Qt::UniqueConnection);
+    QObject::connect(ui->action_connect, &QAction::triggered, m_connection_dialog,
+                     &ConnectionDialog::show, Qt::UniqueConnection);
 
-    QObject::connect(m_connection_dialog, &ConnectionDialog::start_server_requested,
-            this, [&](int port) {
-                if (!m_server->isListening()) {
-                    if (m_server->listen(QHostAddress::Any, port)) {
-                        fmt::println("Server listening on port {}", port);
-                    }
-                }
-            });
+    QObject::connect(m_connection_dialog, &ConnectionDialog::start_server_requested, this,
+                     [&](int port) {
+                         if (!m_server->isListening()) {
+                             if (m_server->listen(QHostAddress::Any, port)) {
+                                 fmt::println("Server listening on port {}", port);
+                             }
+                         }
+                     });
 
-    QObject::connect(m_connection_dialog, &ConnectionDialog::stop_server_requested,
-            this, [&]() {
-                m_server->close();
-                if (m_current_client) {
-                    m_current_client->disconnectFromHost();
-                }
-            });
+    QObject::connect(m_connection_dialog, &ConnectionDialog::stop_server_requested, this, [&]() {
+        m_server->close();
+        if (m_current_client) {
+            m_current_client->disconnectFromHost();
+        }
+    });
 
-    QObject::connect(m_server, &QTcpServer::newConnection, this,
-                     &MainWindow::handle_new_connection, Qt::UniqueConnection);
+    QObject::connect(m_server, &QTcpServer::newConnection, this, &MainWindow::handle_new_connection,
+                     Qt::UniqueConnection);
 
     QObject::connect(m_packet_parser, &PacketParser::got_new_channel, this,
                      [&](const std::string &channel_id, const Plot::CurveConfig &config) {
-        ui->widget_control_tab->add_channel(channel_id);
-        m_plot->add_series(channel_id, config);
-    });
+                         ui->widget_control_tab->add_channel(channel_id);
+                         m_plot->add_series(channel_id, config);
+                     });
 
     QObject::connect(m_packet_parser, &PacketParser::got_channel_data, m_plot,
                      &Plot::PlotHelper::add_point, Qt::UniqueConnection);
 
-    QObject::connect(m_packet_parser, &PacketParser::got_channel_constants,
-                     ui->widget_control_tab, &ControlTab::update_channel_constants, Qt::UniqueConnection);
+    QObject::connect(m_packet_parser, &PacketParser::got_channel_constants, ui->widget_control_tab,
+                     &ControlTab::update_channel_constants, Qt::UniqueConnection);
 }
 
 MainWindow::~MainWindow() {
@@ -87,10 +86,10 @@ void MainWindow::handle_new_connection() {
         ui->widget_control_tab->add_transceiver(m_packet_transceiver);
 
         QObject::connect(m_packet_transceiver, &Communication::PacketTransceiver::packet_received,
-                this, [&](const QByteArray &packet) {
-                        m_packet_parser->process_incoming_packet(packet);
-                        m_connection_dialog->update_byte_count(packet.size());
-        });
+                         this, [&](const QByteArray &packet) {
+                             m_packet_parser->process_incoming_packet(packet);
+                             m_connection_dialog->update_byte_count(packet.size());
+                         });
 
         m_connection_dialog->user_connected();
 
@@ -109,5 +108,3 @@ void MainWindow::handle_new_connection() {
         });
     }
 }
-
-
