@@ -62,9 +62,8 @@ Plot::PlotHelper::PlotHelper(QFrame *frame, QObject* parent)
 
     canvas->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    MultiSeriesTracker *tracker = new MultiSeriesTracker(canvas);
-    tracker->setRubberBandPen(QPen(Qt::yellow, 1, Qt::DotLine));
-    tracker->setTrackerPen(QPen(Qt::yellow));
+    m_picker = new MultiSeriesTracker(canvas);
+    m_picker->setEnabled(false);
 
     QObject::connect(canvas, &QWidget::customContextMenuRequested,
             this, &PlotHelper::show_context_menu, Qt::UniqueConnection);
@@ -363,6 +362,18 @@ void Plot::PlotHelper::set_grid_visible(bool visible) {
     m_plot->replot();
 }
 
+void Plot::PlotHelper::set_tracker_enabled(bool enabled) {
+    if (m_picker) {
+        m_picker->setEnabled(enabled);
+
+        if (m_zoomer) {
+            m_zoomer->setEnabled(!enabled);
+        }
+
+        m_plot->canvas()->update();
+    }
+}
+
 void Plot::PlotHelper::show_context_menu(const QPoint& pos) {
     QMenu menu;
 
@@ -450,6 +461,11 @@ void Plot::PlotHelper::show_context_menu(const QPoint& pos) {
     QObject::connect(legend_action, &QAction::triggered, [&](bool checked) {{
         set_legend_visible(checked);
     }});
+
+    auto *tracker_action = view_menu->addAction("Show Cursor Tracker");
+    tracker_action->setCheckable(true);
+    tracker_action->setChecked(m_picker && m_picker->isEnabled());
+    QObject::connect(tracker_action, &QAction::triggered, this, &PlotHelper::set_tracker_enabled);
 
     view_menu->addSeparator();
 

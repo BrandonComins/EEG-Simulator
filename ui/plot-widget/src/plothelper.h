@@ -121,6 +121,12 @@ class PlotHelper : public QObject {
     void set_grid_visible(bool visible);
 
     /*!
+     * \brief set_tracker_enabled Enable the point tracker
+     * \param enabled True if enabled
+     */
+    void set_tracker_enabled(bool enabled);
+
+    /*!
      * \brief Displays the custom plot context menu at the specified position.
      */
     void show_context_menu(const QPoint& pos);
