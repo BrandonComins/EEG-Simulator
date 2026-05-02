@@ -69,6 +69,15 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 MainWindow::~MainWindow() {
+    if (m_server) {
+        m_server->close();
+    }
+
+    if (m_current_client) {
+        m_current_client->disconnect();
+        m_current_client->abort();
+    }
+
     delete ui;
 }
 
@@ -86,7 +95,7 @@ void MainWindow::handle_new_connection() {
         ui->widget_control_tab->add_transceiver(m_packet_transceiver);
 
         QObject::connect(m_packet_transceiver, &Communication::PacketTransceiver::packet_received,
-                         this, [&](const QByteArray &packet) {
+                         this, [this](const QByteArray &packet) {
                              m_packet_parser->process_incoming_packet(packet);
                              m_connection_dialog->update_byte_count(packet.size());
                          });
@@ -95,8 +104,10 @@ void MainWindow::handle_new_connection() {
 
         ui->widget_control_tab->on_connection();
 
-        QObject::connect(socket, &QTcpSocket::disconnected, this, [&]() {
-            m_connection_dialog->user_disconnected();
+        QObject::connect(socket, &QTcpSocket::disconnected, this, [this, socket]() {
+            if(m_connection_dialog) {
+                m_connection_dialog->user_disconnected();
+            }
 
             if (m_current_client == socket) {
                 m_current_client = nullptr;
@@ -104,7 +115,9 @@ void MainWindow::handle_new_connection() {
             }
             socket->deleteLater();
 
-            ui->widget_control_tab->on_disconnect();
+            if (ui && ui->widget_control_tab) {
+                ui->widget_control_tab->on_disconnect();
+            }
         });
     }
 }
