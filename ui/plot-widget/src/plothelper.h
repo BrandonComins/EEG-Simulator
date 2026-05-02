@@ -17,7 +17,7 @@ class QwtPlotZoomer;
 class QwtPlotPicker;
 
 namespace Plot {
-
+class PeakManager;
 class StyleCurveDiag;
 class ScaleDialog;
 
@@ -127,6 +127,18 @@ class PlotHelper : public QObject {
     void set_tracker_enabled(bool enabled);
 
     /*!
+     * \brief toggle_local_peaks Toggles the local peaks
+     * \param on Shows local peaks if true
+     */
+    void toggle_local_peaks(bool on);
+
+    /*!
+     * \brief toggle_local_mins Toggles the local mins
+     * \param on Shows local mins if true
+     */
+    void toggle_local_mins(bool on);
+
+    /*!
      * \brief Displays the custom plot context menu at the specified position.
      */
     void show_context_menu(const QPoint& pos);
@@ -198,6 +210,7 @@ class PlotHelper : public QObject {
     QwtPlotZoomer *m_zoomer;            //!< Zooming interaction handler.
     QwtPlotMagnifier *m_magnifier;      //!< Mouse-wheel magnification handler.
     MultiSeriesTracker *m_picker;       //!< Displays the point at a picked position
+    PeakManager *m_peak_manager;        //!< Manages local peaks
     std::vector<std::string> m_series_order; //!< The order of insertion for the series
     std::map<std::string, Series> m_series; //!< Map of IDs to data series.
     std::map<std::string, StyleCurveDiag*> m_style_dialogs; //!< Map of IDs to data series dialogs.

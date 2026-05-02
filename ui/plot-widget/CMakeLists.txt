@@ -17,6 +17,8 @@ add_library(${NAME}-lib STATIC
     ${SRC_DIR}/stylecurvediag.h
     ${SRC_DIR}/stylecurvediag.ui
     ${SRC_DIR}/plotdefs.h
+    ${SRC_DIR}/peakmanager.cpp
+    ${SRC_DIR}/peakmanager.h
 )
 
 qt_add_resources(${NAME}-lib "styles"

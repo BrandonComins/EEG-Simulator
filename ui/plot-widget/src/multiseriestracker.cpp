@@ -11,12 +11,11 @@
 #include <QPen>
 #include <QCursor>
 
-namespace Plot {
-
-MultiSeriesTracker::MultiSeriesTracker(QWidget *canvas)
+Plot::MultiSeriesTracker::MultiSeriesTracker(QWidget *canvas)
     : QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
                     QwtPlotPicker::VLineRubberBand,
                     QwtPicker::AlwaysOn, canvas) {
+
     setStateMachine(new QwtPickerTrackerMachine());
     setRubberBandPen(QPen(Qt::blue, 1, Qt::DashLine));
     setTrackerPen(QPen(Qt::blue));
@@ -112,6 +111,4 @@ QwtText Plot::MultiSeriesTracker::trackerTextF(const QPointF &pos) const {
     }
 
     return qwt_text_result;
-}
-
 }

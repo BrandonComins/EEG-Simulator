@@ -2,6 +2,7 @@
 
 #include "scaledialog.h"
 #include "stylecurvediag.h"
+#include "peakmanager.h"
 
 #include <qboxlayout.h>
 #include <qtimer.h>
@@ -64,6 +65,10 @@ Plot::PlotHelper::PlotHelper(QFrame *frame, QObject* parent)
 
     m_picker = new MultiSeriesTracker(canvas);
     m_picker->setEnabled(false);
+
+    m_peak_manager = new PeakManager(m_plot);
+    m_peak_manager->set_peaks_enabled(false);
+    m_peak_manager->set_mins_enabled(false);
 
     QObject::connect(canvas, &QWidget::customContextMenuRequested,
             this, &PlotHelper::show_context_menu, Qt::UniqueConnection);
@@ -179,6 +184,9 @@ void Plot::PlotHelper::add_point(const std::string &id, double x, double y) {
                                      series.y_data.data(),
                                      static_cast<int>(series.x_data.size()));
 
+            if(m_peak_manager->enabled()) {
+                m_peak_manager->refresh_peaks();
+            }
             m_plot->replot();
         }
     } else {
@@ -374,6 +382,14 @@ void Plot::PlotHelper::set_tracker_enabled(bool enabled) {
     }
 }
 
+void Plot::PlotHelper::toggle_local_peaks(bool on) {
+    m_peak_manager->set_peaks_enabled(on);
+}
+
+void Plot::PlotHelper::toggle_local_mins(bool on) {
+    m_peak_manager->set_mins_enabled(on);
+}
+
 void Plot::PlotHelper::show_context_menu(const QPoint& pos) {
     QMenu menu;
 
@@ -462,10 +478,22 @@ void Plot::PlotHelper::show_context_menu(const QPoint& pos) {
         set_legend_visible(checked);
     }});
 
+    view_menu->addSeparator();
+
     auto *tracker_action = view_menu->addAction("Show Cursor Tracker");
     tracker_action->setCheckable(true);
     tracker_action->setChecked(m_picker && m_picker->isEnabled());
     QObject::connect(tracker_action, &QAction::triggered, this, &PlotHelper::set_tracker_enabled);
+
+    auto *peak_action = view_menu->addAction("Show Local Peaks");
+    peak_action->setCheckable(true);
+    peak_action->setChecked(m_peak_manager && m_peak_manager->peaks_enabled());
+    QObject::connect(peak_action, &QAction::triggered, this, &PlotHelper::toggle_local_peaks);
+
+    auto *min_action = view_menu->addAction("Show Local Minimums");
+    min_action->setCheckable(true);
+    min_action->setChecked(m_peak_manager && m_peak_manager->mins_enabled());
+    QObject::connect(min_action, &QAction::triggered, this, &PlotHelper::toggle_local_mins);
 
     view_menu->addSeparator();
 
