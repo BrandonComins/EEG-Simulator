@@ -15,6 +15,8 @@
 #include <qwt_scale_div.h>
 #include <qwt_text.h>
 #include <qwt_picker_machine.h>
+#include <qwt_plot_layout.h>
+#include <qwt_scale_widget.h>
 #include <QFrame>
 #include <QMenu>
 #include <QFile>
@@ -35,7 +37,8 @@ Plot::PlotHelper::PlotHelper(QFrame *frame, QObject* parent)
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(m_plot);
 
-    auto* canvas = qobject_cast<QwtPlotCanvas*>(m_plot->canvas());
+    m_plot->plotLayout()->setAlignCanvasToScales(true);
+    m_plot->axisWidget(QwtPlot::xBottom)->setMinBorderDist(20, 20);
 
     m_grid = new QwtPlotGrid();
     m_grid->enableX(true);
@@ -43,6 +46,8 @@ Plot::PlotHelper::PlotHelper(QFrame *frame, QObject* parent)
     m_grid->setPen(Qt::black, 0.5);
     m_grid->setZ(-1.0);
     m_grid->attach(m_plot);
+
+    auto *canvas = qobject_cast<QwtPlotCanvas*>(m_plot->canvas());
 
     m_zoomer = new QwtPlotZoomer(canvas);
     m_zoomer->setMousePattern(QwtEventPattern::MouseSelect2, Qt::NoButton);
