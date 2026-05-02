@@ -67,7 +67,7 @@ void Communication::PacketTransceiver::process_buffer() {
         const auto *header = reinterpret_cast<const PacketHeader *>(m_incoming_data.constData());
 
         // Make sure we found the header at the start of the frame and it is the expected byte
-        if (static_cast<uint8_t>(header->sof) != static_cast<uint8_t>(0xA5)) {
+        if (static_cast<uint8_t>(header->sof) != static_cast<uint8_t>(SOF_MARKER)) {
             m_incoming_data.remove(0, 1);
             continue;
         }
@@ -88,7 +88,7 @@ void Communication::PacketTransceiver::process_buffer() {
 
         // Make sure the footer is at the end of the frame and is the expected Byte
         const uint8_t footer = static_cast<uint8_t>(m_incoming_data.at(expected_size - 1));
-        if (footer != 0x5A) {
+        if (footer != EOF_MARKER) {
             m_incoming_data.remove(0, 1);
             continue;
         }
