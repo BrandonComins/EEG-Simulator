@@ -7,23 +7,29 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-set(INC_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+set(TEST_DIR ${CMAKE_CURRENT_SOURCE_DIR}/test)
 
 set(SRC
     ${SRC_DIR}/packettransceiver.cpp
-)
-
-set(INC
-    ${INC_DIR}/packets.h
-    ${INC_DIR}/packettransceiver.h
+    ${SRC_DIR}/packets.h
+    ${SRC_DIR}/packettransceiver.h
 )
 
 add_library(${NAME}-lib ${SRC} ${INC})
 
-target_include_directories(${NAME}-lib PUBLIC ${INC_DIR})
+target_include_directories(${NAME}-lib PUBLIC ${SRC_DIR})
 
-target_link_libraries(${NAME}-lib PRIVATE
+target_link_libraries(${NAME}-lib PUBLIC
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Network
+    fmt
 )
+
+add_executable(${NAME}-MWE ${TEST_DIR}/main.cpp)
+
+target_include_directories(${NAME}-MWE PUBLIC ${TEST_DIR})
+
+target_link_libraries(${NAME}-MWE PUBLIC ${NAME}-lib)
+
+target_compile_options(${NAME}-MWE PRIVATE -Wall -Wextra)
