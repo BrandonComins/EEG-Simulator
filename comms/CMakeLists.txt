@@ -27,9 +27,15 @@ target_link_libraries(${NAME}-lib PUBLIC
 )
 
 add_executable(${NAME}-MWE ${TEST_DIR}/main.cpp)
-
 target_include_directories(${NAME}-MWE PUBLIC ${TEST_DIR})
-
 target_link_libraries(${NAME}-MWE PUBLIC ${NAME}-lib)
-
 target_compile_options(${NAME}-MWE PRIVATE -Wall -Wextra)
+
+add_executable(${NAME}-test ${TEST_DIR}/packettransceiver__test.cpp)
+target_include_directories(${NAME}-test PUBLIC ${TEST_DIR})
+target_link_libraries(${NAME}-test PUBLIC
+    ${NAME}-lib
+    Qt${QT_VERSION_MAJOR}::Test
+    gtest_main
+)
+target_compile_options(${NAME}-test PRIVATE -Wall -Wextra)
