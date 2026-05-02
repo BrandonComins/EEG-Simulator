@@ -1,17 +1,28 @@
 #include "connectiondialog.h"
 #include "ui_connectiondialog.h"
 
+#include "plothelper.h"
 #include <QSettings>
+#include <qtimer.h>
 
 constexpr int default_port = 1234;
 
 ConnectionDialog::ConnectionDialog(QWidget *parent)
     : QDialog(parent)
     , m_server_on(false)
+    , m_last_x_axis_point(0.0)
+    , m_bytes_received(0)
+    , m_stats_timer(new QTimer(this))
     , m_settings(new QSettings(QStringLiteral("EEG"), QStringLiteral("Ui Connection"), this))
     , ui(new Ui::ConnectionDialog)
 {
     ui->setupUi(this);
+
+    m_plot = new Plot::PlotHelper(ui->frame, this);
+    m_plot->set_view_mode(Plot::ROLLING);
+    m_plot->set_axis_titles("Seconds Since Server Start", "KB/s");
+    m_plot->set_scale_x(0, 10);
+    m_plot->set_scale_y(0, 15);
 
     setWindowTitle(QStringLiteral("Connection Dialog"));
 
@@ -22,6 +33,8 @@ ConnectionDialog::ConnectionDialog(QWidget *parent)
 
     QObject::connect(ui->pushButton_connect, &QPushButton::clicked,
                      this, &ConnectionDialog::toggle_server);
+
+    QObject::connect(m_stats_timer, &QTimer::timeout, this, &ConnectionDialog::calculate_speed);
 }
 
 ConnectionDialog::~ConnectionDialog() {
@@ -38,8 +51,10 @@ void ConnectionDialog::user_disconnected() {
 
 void ConnectionDialog::toggle_server() {
     if(!m_server_on) {
+        constexpr int time_ms = 1000;
         m_server_on = true;
         ui->pushButton_connect->setText(QStringLiteral("Stop Server"));
+        m_stats_timer->start(time_ms);
         Q_EMIT start_server_requested(ui->spinBox_port->value());
 
         // Save the last used port
@@ -49,8 +64,18 @@ void ConnectionDialog::toggle_server() {
         m_server_on = false;
         set_led_status(false);
         ui->pushButton_connect->setText(QStringLiteral("Start Server"));
+        m_stats_timer->stop();
+        m_bytes_received = 0;
         Q_EMIT stop_server_requested();
     }
+}
+
+void ConnectionDialog::calculate_speed() {
+    constexpr double b_to_kb = 1024.0;
+    double speed_kbps = static_cast<double>(m_bytes_received) / b_to_kb;
+
+    m_bytes_received = 0;
+    m_plot->add_point("Speed", m_last_x_axis_point++, speed_kbps);
 }
 
 void ConnectionDialog::ConnectionDialog::set_led_status(bool connected) {
@@ -71,4 +96,8 @@ void ConnectionDialog::ConnectionDialog::set_led_status(bool connected) {
             "min-height: 20px;"
             );
     }
+}
+
+void ConnectionDialog::update_byte_count(int bytes) {
+    m_bytes_received += bytes;
 }

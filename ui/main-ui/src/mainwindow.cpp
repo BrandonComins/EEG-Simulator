@@ -87,7 +87,10 @@ void MainWindow::handle_new_connection() {
         ui->widget_control_tab->add_transceiver(m_packet_transceiver);
 
         QObject::connect(m_packet_transceiver, &Communication::PacketTransceiver::packet_received,
-                m_packet_parser, &PacketParser::process_incoming_packet, Qt::UniqueConnection);
+                this, [&](const QByteArray &packet) {
+                        m_packet_parser->process_incoming_packet(packet);
+                        m_connection_dialog->update_byte_count(packet.size());
+        });
 
         m_connection_dialog->user_connected();
 
