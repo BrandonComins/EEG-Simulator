@@ -87,7 +87,7 @@ void Communication::PacketTransceiver::process_buffer() {
         }
 
         // Make sure the footer is at the end of the frame and is the expected Byte
-        const uint8_t footer = static_cast<uint8_t>(m_incoming_data.at(expected_size - 1));
+        const uint8_t footer = static_cast<uint8_t>(m_incoming_data.back());
         if (footer != EOF_MARKER) {
             m_incoming_data.remove(0, 1);
             continue;

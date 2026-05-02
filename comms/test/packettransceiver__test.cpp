@@ -68,7 +68,7 @@ TEST_F(PacketTransceiverTest, SendCommandSerialization) {
     EXPECT_FLOAT_EQ(captured->alpha_amplitude, 1.2f);
     EXPECT_FLOAT_EQ(captured->noise_persistence, 0.9f);
 
-    uint8_t eof = static_cast<uint8_t>(buffer_data.at(buffer_data.size() - 1));
+    uint8_t eof = static_cast<uint8_t>(buffer_data.back());
     EXPECT_EQ(eof, Communication::EOF_MARKER);
 }
 
