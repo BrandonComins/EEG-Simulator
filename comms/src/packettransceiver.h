@@ -67,7 +67,7 @@ class PacketTransceiver : public QObject {
     /*!
      * \brief send_reply Send a reply to a command
      * \param cmd The command that is expecting a reply
-     * \param original_req_id The id of the command
+     * \param original_req_id The unique id of the packet
      * \param payload The data of the packet
      */
     template <typename T> void send_reply(OPCode cmd, uint8_t original_req_id, const T &payload) {

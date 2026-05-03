@@ -35,7 +35,7 @@ class CommandParser : public QObject {
 
     /*!
      * \brief execute_command Does a command based on the packet contents
-     * \param cmd The cmd to execute
+     * \param cmd The cmd's opcode to execute
      * \param header The header of the packet
      * \param payload The data of the packet
      * \return True if ran a command successfully

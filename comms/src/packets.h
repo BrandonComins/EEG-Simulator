@@ -38,11 +38,6 @@ struct PacketFooter {
     uint8_t footer;
 }; // 3 Bytes
 
-struct GenericAck {
-    uint8_t command_id; //!< Which command this reply belongs to
-    uint16_t status;    //!< System health (0 = OK)
-}; // 3 Bytes
-
 //!< ----SET PACKETS----
 
 struct ChannelsCount {

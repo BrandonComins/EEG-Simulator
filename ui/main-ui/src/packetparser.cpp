@@ -51,8 +51,9 @@ std::string get_channel_name(int channel_id) {
 
 void PacketParser::handle_eeg_data(const Communication::PacketHeader *header, const char *payload) {
     const auto *sample = reinterpret_cast<const Communication::EEGSample *>(payload);
+    constexpr double ms_to_s = 1000.0;
 
-    const auto x = static_cast<double>(header->timestamp_ms) / 1000.0;
+    const auto x = static_cast<double>(header->timestamp_ms) / ms_to_s;
     const auto y = static_cast<double>(sample->value);
 
     Q_EMIT got_channel_data(get_channel_name(sample->channel_id), x, y);

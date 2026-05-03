@@ -19,10 +19,10 @@ ConnectionDialog::ConnectionDialog(QWidget *parent)
     ui->setupUi(this);
 
     m_plot = new Plot::PlotHelper(ui->frame, this);
-    m_plot->set_view_mode(Plot::ROLLING);
+    m_plot->set_view_mode(Plot::CUMULATIVE);
     m_plot->set_axis_titles("Seconds Since Server Start", "KB/s");
-    m_plot->set_scale_x(0, 10);
-    m_plot->set_scale_y(0, 15);
+    m_plot->set_auto_scale_x(true);
+    m_plot->set_auto_scale_y(true);
 
     setWindowTitle(QStringLiteral("Connection Dialog"));
 

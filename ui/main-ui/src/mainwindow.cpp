@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_plot = new Plot::PlotHelper(ui->frame, this);
     m_plot->set_view_mode(Plot::ROLLING);
-    m_plot->set_scale_x(0, 6);
-    m_plot->set_scale_y(-100, 1100);
+    m_plot->set_scale_x(0, 5);
+    m_plot->set_scale_y(-50, 1050);
 
     ui->action_connect->setShortcut(QKeySequence("Ctrl+C"));
     ui->action_quick_start->setShortcut(QKeySequence("Ctrl+Shift+C"));

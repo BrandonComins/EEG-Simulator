@@ -1,7 +1,6 @@
 #include "eeg.h"
 
 #include "settings_defs.h"
-#include "spdlog/spdlog.h"
 
 #include <QSettings>
 #include <algorithm>
@@ -31,8 +30,7 @@ double get_random_dist(std::mt19937 &seed) {
 
 double EEG::get_next_sample(double time_seconds) {
     // Wave Equation: y(t) = A * sin(2 * PI * f * t)
-    double alpha_wave =
-        m_alpha_amplitude_uv * std::sin(2.0 * M_PI * m_alpha_freq_hz * time_seconds);
+    double alpha_wave = m_alpha_amplitude_uv * std::sin(2.0 * M_PI * m_alpha_freq_hz * time_seconds);
     double beta_wave = m_beta_amplitude_uv * std::sin(2.0 * M_PI * m_beta_freq_hz * time_seconds);
 
     // Generate white noise in range [-0.5, 0.5] * scale

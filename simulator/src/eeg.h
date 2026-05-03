@@ -64,7 +64,7 @@ class EEG {
      * \param time_seconds The current simulation time in seconds.
      * \return Calculated voltage in microvolts (uV).
      */
-    double get_next_sample(double time_seconds);
+    [[nodiscard]] auto get_next_sample(double time_seconds) -> double;
 
     /*!
      * \brief alpha_amplitude_uv Get the alpha amplitude in microvolts (uV)
